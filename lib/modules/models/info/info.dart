@@ -1,0 +1,47 @@
+// import 'package:freezed_annotation/freezed_annotation.dart';
+// import 'package:flutter/foundation.dart';
+
+// import '../dependent/dependent.dart';
+
+// part 'info.freezed.dart';
+// part 'info.g.dart';
+
+// @freezed
+// class Info with _$Info {
+//   factory Info({
+//     @Default('') String id,
+//     @Default('') String lastName,
+//     @Default('') String firstName,
+//     @Default('') String middleName,
+//     @Default('') String presentAddress,
+//     @Default('') String provincialAddress,
+//     DateTime? dateOfBirth,
+//     @Default('') String placeOfBirth,
+//     @Default('') String nationality,
+//     @Default('') String gender,
+//     @Default('') String religion,
+//     @Default('') String civilStatus,
+//     @Default('') String email,
+//     @Default('') String mobileNumber,
+//     @Default('') String telNumber,
+//     @Default('') String passportNumber,
+//     DateTime? expiryDate,
+//     @Default('') String sssNumber,
+//     @Default('') String tinNumber,
+//     @Default([]) List<Dependent> dependents,
+//     @Default('') String agent,
+//     @Default('') String employer,
+//     @Default('') String address,
+//     @Default('') String termOfContract,
+//     @Default('') String position,
+//     DateTime? effectiveDate,
+//     @Default('') String recruitmentAgency,
+//     @Default('') String employmentContactNumber,
+//     @Default('') String natureOfBusiness,
+//     @Default('') String countryOfDeployment,
+//     @Default('') String dateOfEmployment,
+//     @Default('') String occupation,
+//   }) = _Info;
+
+//   factory Info.fromJson(Map<String, dynamic> json) => _$InfoFromJson(json);
+// }
