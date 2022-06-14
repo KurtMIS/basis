@@ -1,12 +1,12 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:stronghold_ofw/modules/shared_widgets/textfield.dart';
 
 import '../../contants/measure.dart';
 import '../models/dependent/dependent.dart';
+import '../shared_widgets/dialogs.dart';
 import '../shared_widgets/popup_containers.dart';
 
 class InputPage extends StatefulWidget {
@@ -41,7 +41,7 @@ class _InputPageState extends State<InputPage> {
   final expiryDate = TextEditingController();
   final sssNumber = TextEditingController();
   final tinNumber = TextEditingController();
-  final _dependents = BehaviorSubject<List<Dependent>>.seeded(<Dependent>[]);
+  final _dependents = BehaviorSubject<List<Dependent>>.seeded([]);
   final agent = TextEditingController();
   final employerName = TextEditingController();
   final employerAddress = TextEditingController();
@@ -55,6 +55,12 @@ class _InputPageState extends State<InputPage> {
   final countryOfDeployment = TextEditingController();
   // var employmentDate = DateTime.now();
   final employmentDate = TextEditingController();
+
+  final nameDependent = TextEditingController();
+  final relationshipDependent = TextEditingController();
+  final dateOfBirthDependent = TextEditingController();
+  final sharingDependent = TextEditingController();
+  final revocableDependent = TextEditingController();
 
   //     @Default('') String id,
 //     @Default('') String lastName,
@@ -210,70 +216,199 @@ class _InputPageState extends State<InputPage> {
   }
 
   List<Widget> imgList(BuildContext context) => [
-        Card(
-          elevation: 5,
-          // color: ,
-          child: Padding(
-            padding: EdgeInsets.all(isWeb(context) ? 30.0 : 20),
-            child: Wrap(
-              crossAxisAlignment: WrapCrossAlignment.start,
-              alignment: WrapAlignment.start,
-              spacing: 25.0,
-              runSpacing: 20.0,
-              children: [
-                textField(
-                  lastName,
-                  '*Last Name',
-                ),
-                textField(
-                  firstName,
-                  '*First Name',
-                ),
-                textField(
-                  middleName,
-                  'Middle Name',
-                ),
-                TextFieldShared(
-                  constraints: const BoxConstraints(maxWidth: 500),
-                  maxLines: 3,
-                  ctrler: presentAddress,
-                  labelText: '*Present Address',
-                ),
-                TextFieldShared(
-                  constraints: const BoxConstraints(maxWidth: 500),
-                  maxLines: 3,
-                  ctrler: provincialAddress,
-                  labelText: 'Provincial Address',
-                ),
-                textFieldDate(dateOfBirth, '*Date of Birth'),
-                textField(
-                  placeOfBirth,
-                  '*Place of Birth',
-                ),
-                textField(nationality, '*Nationality'),
-                textField(gender, '*Gender'),
-                textField(religion, '*Religion'),
-                textField(civilStatus, '*Civil Status'),
-                textField(email, '*E-mail Address'),
-                textField(mobileNumber, 'Mobile Number'),
-                textField(telNumber, 'Telephone Number'),
-                textField(passportNumber, '*Passport Number'),
-                textFieldDate(
-                  expiryDate,
-                  '*Expiry Date',
-                ),
-                textField(sssNumber, 'SSS Number'),
-                textField(
-                  tinNumber,
-                  'TIN',
-                ),
-              ],
+        Wrap(
+          crossAxisAlignment: WrapCrossAlignment.start,
+          alignment: WrapAlignment.start,
+          spacing: 25.0,
+          runSpacing: 20.0,
+          children: [
+            textField(
+              lastName,
+              '*Last Name',
             ),
-          ),
+            textField(
+              firstName,
+              '*First Name',
+            ),
+            textField(
+              middleName,
+              'Middle Name',
+            ),
+            TextFieldShared(
+              constraints: const BoxConstraints(maxWidth: 500),
+              maxLines: 3,
+              ctrler: presentAddress,
+              labelText: '*Present Address',
+            ),
+            TextFieldShared(
+              constraints: const BoxConstraints(maxWidth: 500),
+              maxLines: 3,
+              ctrler: provincialAddress,
+              labelText: 'Provincial Address',
+            ),
+            textFieldDate(dateOfBirth, '*Date of Birth'),
+            textField(
+              placeOfBirth,
+              '*Place of Birth',
+            ),
+            textField(nationality, '*Nationality'),
+            textField(gender, '*Gender'),
+            textField(religion, '*Religion'),
+            textField(civilStatus, '*Civil Status'),
+            textField(email, '*E-mail Address'),
+            textField(mobileNumber, 'Mobile Number'),
+            textField(telNumber, 'Telephone Number'),
+            textField(passportNumber, '*Passport Number'),
+            textFieldDate(
+              expiryDate,
+              '*Expiry Date',
+            ),
+            textField(sssNumber, 'SSS Number'),
+            textField(
+              tinNumber,
+              'TIN',
+            ),
+          ],
         ),
-        Container(
-          color: Colors.blue,
-        ),
+        Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              StreamBuilder<List<Dependent>>(
+                  stream: _dependents,
+                  builder: (context, snapshot) {
+                    if (snapshot.data == null) {
+                      return const SizedBox();
+                    }
+                    if (snapshot.data!.isEmpty) {
+                      return const SizedBox();
+                    }
+
+                    final data = snapshot.data;
+
+                    return Column(
+                      children: [
+                        ...data!
+                            .map((x) => Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    ListTile(
+                                      title: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(x.name),
+                                          Text(x.relationshipToInsured)
+                                        ],
+                                      ),
+                                      onTap: () {},
+                                      contentPadding: const EdgeInsets.all(5),
+                                      subtitle: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 8.0),
+                                        child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              if (x.dateOfBirth != null)
+                                                Text(DateFormat('dd/MM/yyyy')
+                                                    .format(x.dateOfBirth!)),
+                                              Text('Share ${x.sharing}%'),
+                                              Text(x.revocability)
+                                            ]),
+                                      ),
+                                    ),
+                                    const Divider(
+                                      height: 2,
+                                    )
+                                  ],
+                                ))
+                            .toList()
+                      ],
+                    );
+                  }),
+              const SizedBox(height: 25),
+              FloatingActionButton.extended(
+                  icon: const Icon(Icons.add),
+                  onPressed: () {
+                    showDialogShared(
+                        context,
+                        Container(
+                          constraints: const BoxConstraints(maxHeight: 500),
+                          // height: 220,
+                          width: 330,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.all(16),
+                                child: Text(
+                                  'Dependent Information',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              ),
+                              const Divider(
+                                height: 0,
+                                thickness: 1,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  children: [
+                                    textField(nameDependent, 'Full Name'),
+                                    const SizedBox(height: 20),
+                                    textField(relationshipDependent,
+                                        'Relationship to this person'),
+                                    const SizedBox(height: 20),
+                                    textFieldDate(
+                                        dateOfBirthDependent, 'Date of Birth'),
+                                    const SizedBox(height: 20),
+                                    textField(
+                                        sharingDependent, 'Sharing ( % )'),
+                                    const SizedBox(height: 20),
+                                    textField(revocableDependent, 'Revocable?'),
+                                    const SizedBox(height: 20),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.only(
+                                    left: 16, right: 16, bottom: 16),
+                                child: ElevatedButton(
+                                    child: const Text('Add Dependent'),
+                                    onPressed: () async {
+                                      final date =
+                                          dateOfBirthDependent.text.split('/');
+                                      final dependent = Dependent(
+                                          name: nameDependent.text,
+                                          relationshipToInsured:
+                                              relationshipDependent.text,
+                                          dateOfBirth: DateTime.parse(
+                                              '${date[2]}-${date[1]}-${date[0]}'),
+                                          revocability: revocableDependent.text,
+                                          sharing: sharingDependent.text);
+                                      if (_dependents.value.isEmpty) {
+                                        _dependents.add([dependent]);
+                                      } else {
+                                        _dependents.add(
+                                            [..._dependents.value, dependent]);
+                                      }
+                                      Navigator.pop(context);
+                                    }),
+                              ),
+                            ],
+                          ),
+                        ));
+                  },
+                  label: const Text('Add dependent'))
+            ]),
         Container(
           color: Colors.red,
         ),
@@ -287,6 +422,16 @@ class _InputPageState extends State<InputPage> {
       constraints: isWeb(context) ? const BoxConstraints(maxWidth: 300) : null,
       ctrler: ctrler,
       labelText: labelText,
+    );
+  }
+
+  Card container(Widget child) {
+    return Card(
+      elevation: 5,
+      child: Padding(
+        padding: EdgeInsets.all(isWeb(context) ? 30.0 : 20),
+        child: child,
+      ),
     );
   }
 
@@ -321,8 +466,8 @@ class _InputPageState extends State<InputPage> {
 
   List<Widget> imageSliders(BuildContext context) => imgList(context)
       .map((item) => Padding(
-            padding: EdgeInsets.all(20),
-            child: SingleChildScrollView(child: item),
+            padding: const EdgeInsets.all(20),
+            child: SingleChildScrollView(child: container(item)),
           ))
       .toList();
 }
