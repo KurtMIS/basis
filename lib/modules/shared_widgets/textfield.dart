@@ -18,20 +18,24 @@ class TextFieldShared extends StatefulWidget {
   final Function(String)? onChanged;
   final String? Function(String?)? validator;
   final int? maxLines;
+  final TextInputType? keyboardType;
+  final String? hintText;
 
-  const TextFieldShared(
-      {Key? key,
-      this.labelText,
-      this.prefixIcon,
-      this.suffixIcon,
-      this.ctrler,
-      this.onTap,
-      this.constraints,
-      this.onChanged,
-      this.validator,
-      this.maxLines,
-      this.readOnly})
-      : super(key: key);
+  const TextFieldShared({
+    Key? key,
+    this.labelText,
+    this.prefixIcon,
+    this.suffixIcon,
+    this.ctrler,
+    this.onTap,
+    this.constraints,
+    this.onChanged,
+    this.validator,
+    this.maxLines,
+    this.readOnly,
+    this.keyboardType,
+    this.hintText,
+  }) : super(key: key);
 
   @override
   State<TextFieldShared> createState() => _TextFieldSharedState();
@@ -41,6 +45,7 @@ class _TextFieldSharedState extends State<TextFieldShared> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      keyboardType: widget.keyboardType ?? TextInputType.name,
       validator: widget.validator,
       maxLines: widget.maxLines,
       onChanged: widget.onChanged,
@@ -54,6 +59,7 @@ class _TextFieldSharedState extends State<TextFieldShared> {
         }
       },
       decoration: InputDecoration(
+          hintText: widget.hintText ?? '',
           constraints: widget.constraints,
           isDense: true,
           isCollapsed: true,
