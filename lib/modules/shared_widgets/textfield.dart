@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-import '../../contants/measure.dart';
+import '../../constants/measure.dart';
 
 class TextFieldShared extends StatefulWidget {
   final String? labelText;

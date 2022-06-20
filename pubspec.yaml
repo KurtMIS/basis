@@ -33,6 +33,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   dio: ^4.0.6
   firebase_core: ^1.17.1
+  firebase_storage: ^10.2.18
   flutter:
     sdk: flutter
   flutter_stripe: ^3.0.2

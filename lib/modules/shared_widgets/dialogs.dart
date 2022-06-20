@@ -15,3 +15,48 @@ showDialogShared(BuildContext context, Widget page,
             child: page,
           ));
 }
+
+Future<bool> showConfirmDialog(
+  BuildContext context,
+  String question,
+) async {
+  var res = false;
+  await showDialog(
+    context: context,
+    barrierDismissible: false,
+    barrierColor: Colors.black54,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Confirmation'),
+        content: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              Text(question),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text(
+              'Cancel',
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          TextButton(
+            style: TextButton.styleFrom(backgroundColor: Colors.blue),
+            child: const Text(
+              'Yes',
+            ),
+            onPressed: () {
+              res = true;
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+  return res;
+}

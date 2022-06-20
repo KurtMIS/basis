@@ -1,15 +1,16 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:stronghold_ofw/modules/shared_widgets/textfield.dart';
-
-import '../../contants/measure.dart';
+import '../../constants/measure.dart';
+import '../../services/locator.dart';
+import '../../utils/date_convert.dart';
+import '../logics/input.dart';
 import '../models/dependent/dependent.dart';
+import '../models/info/info.dart';
 import '../shared_widgets/dialogs.dart';
 import '../shared_widgets/popup_containers.dart';
-import '../shared_widgets/text.dart';
 
 class InputPage extends StatefulWidget {
   const InputPage({Key? key}) : super(key: key);
@@ -19,6 +20,8 @@ class InputPage extends StatefulWidget {
 }
 
 class _InputPageState extends State<InputPage> {
+  final input = locator.get<Input>();
+
   final CarouselController carouselCtrler = CarouselController();
   final _formKey = GlobalKey<FormState>();
   final _current$ = BehaviorSubject<int>.seeded(0);
@@ -60,6 +63,84 @@ class _InputPageState extends State<InputPage> {
   final dateOfBirthDependent = TextEditingController();
   final sharingDependent = TextEditingController();
   final revocableDependent = TextEditingController();
+  String docIdFromCurrentDate() => DateTime.now().toIso8601String();
+
+  void setInfo() async {
+    final res =
+        await showConfirmDialog(context, 'Are you sure you want to proceed');
+    if (!res) {
+      return;
+    }
+    input.setInfo(Info(
+        id: docIdFromCurrentDate() +
+            stringToDate(dateOfBirth.text).toIso8601String(),
+        presentAddress: presentAddress.text,
+        agent: agent.text,
+        civilStatus: civilStatus.text,
+        countryOfDeployment: countryOfDeployment.text,
+        dateOfBirth: dateOfBirth.text,
+        dateOfEmployment: employmentDate.text,
+        dependents: _dependents.value.map((e) => e.toJson()).toList(),
+        email: email.text,
+        effectiveDate: effectiveDate.text,
+        employer: employerName.text,
+        employmentContactNumber: employmentContactNumber.text,
+        expiryDate: expiryDate.text,
+        firstName: firstName.text,
+        gender: gender.text,
+        lastName: lastName.text,
+        middleName: middleName.text,
+        mobileNumber: mobileNumber.text,
+        nationality: nationality.text,
+        natureOfBusiness: natureOfBusiness.text,
+        passportNumber: passportNumber.text,
+        placeOfBirth: placeOfBirth.text,
+        position: position.text,
+        address: employerAddress.text,
+        provincialAddress: provincialAddress.text,
+        recruitmentAgency: recruitmentAgency.text,
+        religion: religion.text,
+        sssNumber: sssNumber.text,
+        telNumber: telNumber.text,
+        termOfContract: termOfContract.text,
+        tinNumber: tinNumber.text));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      presentAddress.text = 'presentAddress';
+      agent.text = 'agent';
+      civilStatus.text = 'civilStatus';
+      countryOfDeployment.text = 'countryOfDeployment';
+      dateOfBirth.text = '10/10/1988';
+      employmentDate.text = '22/06/2021';
+      email.text = 'email';
+      effectiveDate.text = '22/07/2022';
+      employerName.text = 'employerName';
+      employmentContactNumber.text = 'employmentContactNumber';
+      expiryDate.text = '10/05/2025';
+      firstName.text = 'firstName';
+      gender.text = 'male';
+      lastName.text = 'lastname';
+      middleName.text = 'middleNAME';
+      mobileNumber.text = '12345678';
+      nationality.text = 'nationality';
+      natureOfBusiness.text = 'natureOfBusiness';
+      passportNumber.text = '111111111111';
+      placeOfBirth.text = 'placeofbirth';
+      position.text = 'position';
+      employerAddress.text = 'employerAddress';
+      provincialAddress.text = 'provincialAddress';
+      recruitmentAgency.text = 'recruitmentAgency';
+      religion.text = 'religion';
+      sssNumber.text = 'sssNumber';
+      telNumber.text = 'telNumber';
+      termOfContract.text = 'termOfContract';
+      tinNumber.text = 'tinNumber';
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,59 +150,61 @@ class _InputPageState extends State<InputPage> {
               title: const Text('Stronghold for OFW'),
             )
           : null,
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            physics: const NeverScrollableScrollPhysics(),
-            child: Column(children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  previousButton(),
-                  StreamBuilder<int>(
-                      stream: _current$,
-                      builder: (context, snapshot) {
-                        final val = snapshot.hasData ? snapshot.data : 0;
-                        return Column(
-                          children: [
-                            Text(
-                              pageTitles(val!),
-                              style: TextStyle(color: Colors.blue),
-                            ),
-                            pageIndicator(val),
-                          ],
-                        );
-                      }),
-                  nextButton(),
-                ],
-              ),
-              const Divider(
-                height: 1,
-              ),
-              Expanded(child: pagesContainer()),
-            ]),
-          ),
-          // Positioned(
-          //   bottom: 0,
-          //   right: 0,
-          //   left: 0,
-          //   child: Container(
-          //     color: Colors.white,
-          //     padding: const EdgeInsets.all(8.0),
-          //     child: Row(
-          //       mainAxisAlignment: MainAxisAlignment.end,
-          //       crossAxisAlignment: CrossAxisAlignment.center,
-          //       children: [
-          //         cancelButton(),
-          //         const SizedBox(
-          //           width: 10,
-          //         ),
-          //         saveButton()
-          //       ],
-          //     ),
-          //   ),
-          // )
-        ],
+      body: SingleChildScrollView(
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              physics: const NeverScrollableScrollPhysics(),
+              child: Column(children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    previousButton(),
+                    StreamBuilder<int>(
+                        stream: _current$,
+                        builder: (context, snapshot) {
+                          final val = snapshot.hasData ? snapshot.data : 0;
+                          return Column(
+                            children: [
+                              Text(
+                                pageTitles(val!),
+                                style: TextStyle(color: Colors.blue),
+                              ),
+                              pageIndicator(val),
+                            ],
+                          );
+                        }),
+                    nextButton(),
+                  ],
+                ),
+                const Divider(
+                  height: 1,
+                ),
+                pagesContainer(),
+              ]),
+            ),
+            // Positioned(
+            //   bottom: 0,
+            //   right: 0,
+            //   left: 0,
+            //   child: Container(
+            //     color: Colors.white,
+            //     padding: const EdgeInsets.all(8.0),
+            //     child: Row(
+            //       mainAxisAlignment: MainAxisAlignment.end,
+            //       crossAxisAlignment: CrossAxisAlignment.center,
+            //       children: [
+            //         cancelButton(),
+            //         const SizedBox(
+            //           width: 10,
+            //         ),
+            //         saveButton()
+            //       ],
+            //     ),
+            //   ),
+            // )
+          ],
+        ),
       ),
     );
   }
@@ -180,80 +263,76 @@ class _InputPageState extends State<InputPage> {
     );
   }
 
-  List<Widget> imgList(BuildContext context) => [
-        Column(
-          children: [
-            Expanded(
-              child: SizedBox(
-                height: mqHeight(context),
-                child: SingleChildScrollView(
-                  child: Wrap(
-                    crossAxisAlignment: WrapCrossAlignment.start,
-                    alignment: WrapAlignment.start,
-                    spacing: 25.0,
-                    runSpacing: 20.0,
-                    children: [
-                      textField(
-                        lastName,
-                        '*Last Name',
-                      ),
-                      textField(
-                        firstName,
-                        '*First Name',
-                      ),
-                      textField(
-                        middleName,
-                        'Middle Name',
-                      ),
-                      TextFieldShared(
-                        constraints: const BoxConstraints(maxWidth: 500),
-                        maxLines: 3,
-                        ctrler: presentAddress,
-                        labelText: '*Present Address',
-                        keyboardType: TextInputType.streetAddress,
-                      ),
-                      TextFieldShared(
-                          constraints: const BoxConstraints(maxWidth: 500),
-                          maxLines: 3,
-                          ctrler: provincialAddress,
-                          labelText: 'Provincial Address',
-                          keyboardType: TextInputType.streetAddress),
-                      textFieldDate(dateOfBirth, '*Date of Birth'),
-                      textField(
-                        placeOfBirth,
-                        '*Place of Birth',
-                      ),
-                      textField(nationality, '*Nationality',
-                          hintText: 'Filipino'),
-                      textField(gender, '*Gender', hintText: 'Male/Female'),
-                      textField(
-                        religion,
-                        '*Religion',
-                      ),
-                      textField(civilStatus, '*Civil Status',
-                          hintText: 'Single/Married'),
-                      textField(email, '*E-mail Address',
-                          hintText: 'delacruz@gmail.com',
-                          keyboardType: TextInputType.emailAddress),
-                      textField(mobileNumber, 'Mobile Number',
-                          keyboardType: TextInputType.phone),
-                      textField(telNumber, 'Telephone Number',
-                          keyboardType: TextInputType.phone),
-                      textField(passportNumber, '*Passport Number',
-                          keyboardType: TextInputType.number),
-                      textFieldDate(
-                        expiryDate,
-                        '*Expiry Date',
-                      ),
-                      textField(sssNumber, 'SSS Number',
-                          keyboardType: TextInputType.number),
-                      textField(tinNumber, 'TIN',
-                          keyboardType: TextInputType.number),
-                    ],
-                  ),
-                ),
-              ),
+  List<Widget> imageSliders(BuildContext context) => imgList(context)
+      .map((item) => SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  left: 20, right: 20, top: 20, bottom: 50),
+              child: container(item),
             ),
+          ))
+      .toList();
+
+  List<Widget> imgList(BuildContext context) => [
+        Wrap(
+          crossAxisAlignment: WrapCrossAlignment.start,
+          alignment: WrapAlignment.start,
+          spacing: 25.0,
+          runSpacing: 20.0,
+          children: [
+            textField(
+              lastName,
+              '*Last Name',
+            ),
+            textField(
+              firstName,
+              '*First Name',
+            ),
+            textField(
+              middleName,
+              'Middle Name',
+            ),
+            TextFieldShared(
+              constraints: const BoxConstraints(maxWidth: 500),
+              maxLines: 3,
+              ctrler: presentAddress,
+              labelText: '*Present Address',
+              keyboardType: TextInputType.streetAddress,
+            ),
+            TextFieldShared(
+                constraints: const BoxConstraints(maxWidth: 500),
+                maxLines: 3,
+                ctrler: provincialAddress,
+                labelText: 'Provincial Address',
+                keyboardType: TextInputType.streetAddress),
+            textFieldDate(dateOfBirth, '*Date of Birth'),
+            textField(
+              placeOfBirth,
+              '*Place of Birth',
+            ),
+            textField(nationality, '*Nationality', hintText: 'Filipino'),
+            textField(gender, '*Gender', hintText: 'Male/Female'),
+            textField(
+              religion,
+              '*Religion',
+            ),
+            textField(civilStatus, '*Civil Status', hintText: 'Single/Married'),
+            textField(email, '*E-mail Address',
+                hintText: 'delacruz@gmail.com',
+                keyboardType: TextInputType.emailAddress),
+            textField(mobileNumber, 'Mobile Number',
+                keyboardType: TextInputType.phone),
+            textField(telNumber, 'Telephone Number',
+                keyboardType: TextInputType.phone),
+            textField(passportNumber, '*Passport Number',
+                keyboardType: TextInputType.number),
+            textFieldDate(
+              expiryDate,
+              '*Expiry Date',
+            ),
+            textField(sssNumber, 'SSS Number',
+                keyboardType: TextInputType.number),
+            textField(tinNumber, 'TIN', keyboardType: TextInputType.number),
           ],
         ),
         Column(
@@ -601,6 +680,20 @@ class _InputPageState extends State<InputPage> {
                 ),
               ],
             ),
+            const Divider(),
+            Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: Center(
+                  child: ElevatedButton(
+                onPressed: () {
+                  setInfo();
+                },
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Text('Proceed'),
+                ),
+              )),
+            )
           ],
         )
       ];
@@ -714,12 +807,4 @@ class _InputPageState extends State<InputPage> {
           termOfContract.text = result;
         });
   }
-
-  List<Widget> imageSliders(BuildContext context) => imgList(context)
-      .map((item) => Padding(
-            padding:
-                const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 50),
-            child: container(item),
-          ))
-      .toList();
 }
