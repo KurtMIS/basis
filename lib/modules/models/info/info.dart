@@ -40,6 +40,8 @@ class Info with _$Info {
     @Default('') String countryOfDeployment,
     @Default('') String dateOfEmployment,
     @Default('') String occupation,
+    @Default(false) bool isPaid,
+    @Default(false) bool isDone,
   }) = _Info;
 
   factory Info.fromJson(Map<String, dynamic> json) => _$InfoFromJson(json);

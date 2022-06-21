@@ -42,6 +42,8 @@ _$_Info _$$_InfoFromJson(Map<String, dynamic> json) => _$_Info(
       countryOfDeployment: json['countryOfDeployment'] as String? ?? '',
       dateOfEmployment: json['dateOfEmployment'] as String? ?? '',
       occupation: json['occupation'] as String? ?? '',
+      isPaid: json['isPaid'] as bool? ?? false,
+      isDone: json['isDone'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$$_InfoToJson(_$_Info instance) => <String, dynamic>{
@@ -77,4 +79,6 @@ Map<String, dynamic> _$$_InfoToJson(_$_Info instance) => <String, dynamic>{
       'countryOfDeployment': instance.countryOfDeployment,
       'dateOfEmployment': instance.dateOfEmployment,
       'occupation': instance.occupation,
+      'isPaid': instance.isPaid,
+      'isDone': instance.isDone,
     };

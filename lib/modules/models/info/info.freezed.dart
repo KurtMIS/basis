@@ -53,6 +53,8 @@ mixin _$Info {
   String get countryOfDeployment => throw _privateConstructorUsedError;
   String get dateOfEmployment => throw _privateConstructorUsedError;
   String get occupation => throw _privateConstructorUsedError;
+  bool get isPaid => throw _privateConstructorUsedError;
+  bool get isDone => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -95,7 +97,9 @@ abstract class $InfoCopyWith<$Res> {
       String natureOfBusiness,
       String countryOfDeployment,
       String dateOfEmployment,
-      String occupation});
+      String occupation,
+      bool isPaid,
+      bool isDone});
 }
 
 /// @nodoc
@@ -140,6 +144,8 @@ class _$InfoCopyWithImpl<$Res> implements $InfoCopyWith<$Res> {
     Object? countryOfDeployment = freezed,
     Object? dateOfEmployment = freezed,
     Object? occupation = freezed,
+    Object? isPaid = freezed,
+    Object? isDone = freezed,
   }) {
     return _then(_value.copyWith(
       id: id == freezed
@@ -270,6 +276,14 @@ class _$InfoCopyWithImpl<$Res> implements $InfoCopyWith<$Res> {
           ? _value.occupation
           : occupation // ignore: cast_nullable_to_non_nullable
               as String,
+      isPaid: isPaid == freezed
+          ? _value.isPaid
+          : isPaid // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isDone: isDone == freezed
+          ? _value.isDone
+          : isDone // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -311,7 +325,9 @@ abstract class _$$_InfoCopyWith<$Res> implements $InfoCopyWith<$Res> {
       String natureOfBusiness,
       String countryOfDeployment,
       String dateOfEmployment,
-      String occupation});
+      String occupation,
+      bool isPaid,
+      bool isDone});
 }
 
 /// @nodoc
@@ -357,6 +373,8 @@ class __$$_InfoCopyWithImpl<$Res> extends _$InfoCopyWithImpl<$Res>
     Object? countryOfDeployment = freezed,
     Object? dateOfEmployment = freezed,
     Object? occupation = freezed,
+    Object? isPaid = freezed,
+    Object? isDone = freezed,
   }) {
     return _then(_$_Info(
       id: id == freezed
@@ -487,6 +505,14 @@ class __$$_InfoCopyWithImpl<$Res> extends _$InfoCopyWithImpl<$Res>
           ? _value.occupation
           : occupation // ignore: cast_nullable_to_non_nullable
               as String,
+      isPaid: isPaid == freezed
+          ? _value.isPaid
+          : isPaid // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isDone: isDone == freezed
+          ? _value.isDone
+          : isDone // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -526,7 +552,9 @@ class _$_Info with DiagnosticableTreeMixin implements _Info {
       this.natureOfBusiness = '',
       this.countryOfDeployment = '',
       this.dateOfEmployment = '',
-      this.occupation = ''})
+      this.occupation = '',
+      this.isPaid = false,
+      this.isDone = false})
       : _dependents = dependents;
 
   factory _$_Info.fromJson(Map<String, dynamic> json) => _$$_InfoFromJson(json);
@@ -632,10 +660,16 @@ class _$_Info with DiagnosticableTreeMixin implements _Info {
   @override
   @JsonKey()
   final String occupation;
+  @override
+  @JsonKey()
+  final bool isPaid;
+  @override
+  @JsonKey()
+  final bool isDone;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Info(id: $id, lastName: $lastName, firstName: $firstName, middleName: $middleName, presentAddress: $presentAddress, provincialAddress: $provincialAddress, dateOfBirth: $dateOfBirth, placeOfBirth: $placeOfBirth, nationality: $nationality, gender: $gender, religion: $religion, civilStatus: $civilStatus, email: $email, mobileNumber: $mobileNumber, telNumber: $telNumber, passportNumber: $passportNumber, expiryDate: $expiryDate, sssNumber: $sssNumber, tinNumber: $tinNumber, dependents: $dependents, agent: $agent, employer: $employer, address: $address, termOfContract: $termOfContract, position: $position, effectiveDate: $effectiveDate, recruitmentAgency: $recruitmentAgency, employmentContactNumber: $employmentContactNumber, natureOfBusiness: $natureOfBusiness, countryOfDeployment: $countryOfDeployment, dateOfEmployment: $dateOfEmployment, occupation: $occupation)';
+    return 'Info(id: $id, lastName: $lastName, firstName: $firstName, middleName: $middleName, presentAddress: $presentAddress, provincialAddress: $provincialAddress, dateOfBirth: $dateOfBirth, placeOfBirth: $placeOfBirth, nationality: $nationality, gender: $gender, religion: $religion, civilStatus: $civilStatus, email: $email, mobileNumber: $mobileNumber, telNumber: $telNumber, passportNumber: $passportNumber, expiryDate: $expiryDate, sssNumber: $sssNumber, tinNumber: $tinNumber, dependents: $dependents, agent: $agent, employer: $employer, address: $address, termOfContract: $termOfContract, position: $position, effectiveDate: $effectiveDate, recruitmentAgency: $recruitmentAgency, employmentContactNumber: $employmentContactNumber, natureOfBusiness: $natureOfBusiness, countryOfDeployment: $countryOfDeployment, dateOfEmployment: $dateOfEmployment, occupation: $occupation, isPaid: $isPaid, isDone: $isDone)';
   }
 
   @override
@@ -675,7 +709,9 @@ class _$_Info with DiagnosticableTreeMixin implements _Info {
       ..add(DiagnosticsProperty('natureOfBusiness', natureOfBusiness))
       ..add(DiagnosticsProperty('countryOfDeployment', countryOfDeployment))
       ..add(DiagnosticsProperty('dateOfEmployment', dateOfEmployment))
-      ..add(DiagnosticsProperty('occupation', occupation));
+      ..add(DiagnosticsProperty('occupation', occupation))
+      ..add(DiagnosticsProperty('isPaid', isPaid))
+      ..add(DiagnosticsProperty('isDone', isDone));
   }
 
   @override
@@ -733,7 +769,9 @@ class _$_Info with DiagnosticableTreeMixin implements _Info {
             const DeepCollectionEquality()
                 .equals(other.dateOfEmployment, dateOfEmployment) &&
             const DeepCollectionEquality()
-                .equals(other.occupation, occupation));
+                .equals(other.occupation, occupation) &&
+            const DeepCollectionEquality().equals(other.isPaid, isPaid) &&
+            const DeepCollectionEquality().equals(other.isDone, isDone));
   }
 
   @JsonKey(ignore: true)
@@ -771,7 +809,9 @@ class _$_Info with DiagnosticableTreeMixin implements _Info {
         const DeepCollectionEquality().hash(natureOfBusiness),
         const DeepCollectionEquality().hash(countryOfDeployment),
         const DeepCollectionEquality().hash(dateOfEmployment),
-        const DeepCollectionEquality().hash(occupation)
+        const DeepCollectionEquality().hash(occupation),
+        const DeepCollectionEquality().hash(isPaid),
+        const DeepCollectionEquality().hash(isDone)
       ]);
 
   @JsonKey(ignore: true)
@@ -818,7 +858,9 @@ abstract class _Info implements Info {
       final String natureOfBusiness,
       final String countryOfDeployment,
       final String dateOfEmployment,
-      final String occupation}) = _$_Info;
+      final String occupation,
+      final bool isPaid,
+      final bool isDone}) = _$_Info;
 
   factory _Info.fromJson(Map<String, dynamic> json) = _$_Info.fromJson;
 
@@ -887,6 +929,10 @@ abstract class _Info implements Info {
   String get dateOfEmployment => throw _privateConstructorUsedError;
   @override
   String get occupation => throw _privateConstructorUsedError;
+  @override
+  bool get isPaid => throw _privateConstructorUsedError;
+  @override
+  bool get isDone => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
   _$$_InfoCopyWith<_$_Info> get copyWith => throw _privateConstructorUsedError;

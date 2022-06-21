@@ -103,7 +103,9 @@ class _InputPageState extends State<InputPage> {
         sssNumber: sssNumber.text,
         telNumber: telNumber.text,
         termOfContract: termOfContract.text,
-        tinNumber: tinNumber.text));
+        tinNumber: tinNumber.text,
+        isDone: false,
+        isPaid: false));
   }
 
   @override
@@ -681,18 +683,36 @@ class _InputPageState extends State<InputPage> {
               ],
             ),
             const Divider(),
+            Container(
+                padding: const EdgeInsets.all(10),
+                alignment: Alignment.center,
+                width: double.infinity,
+                color: Colors.blue,
+                child: const Text('Payment Options')),
+            Column(
+              children: [],
+            ),
             Padding(
               padding: const EdgeInsets.all(25.0),
-              child: Center(
-                  child: ElevatedButton(
-                onPressed: () {
-                  setInfo();
-                },
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Text('Proceed'),
-                ),
-              )),
+              child: Column(
+                children: [
+                  const Text(
+                      '*Make sure to complete any of the payment options first'),
+                  Center(
+                      child: ElevatedButton(
+                    style: TextButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        padding: const EdgeInsets.all(15)),
+                    onPressed: () {
+                      setInfo();
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Text('Send Form', style: TextStyle(fontSize: 15)),
+                    ),
+                  )),
+                ],
+              ),
             )
           ],
         )
