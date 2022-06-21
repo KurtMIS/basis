@@ -25,6 +25,7 @@ class _InputPageState extends State<InputPage> {
   final CarouselController carouselCtrler = CarouselController();
   final _formKey = GlobalKey<FormState>();
   final _current$ = BehaviorSubject<int>.seeded(0);
+  final _selectedPayment$ = BehaviorSubject<int>.seeded(0);
 
   final firstName = TextEditingController();
   final lastName = TextEditingController();
@@ -185,26 +186,6 @@ class _InputPageState extends State<InputPage> {
                 pagesContainer(),
               ]),
             ),
-            // Positioned(
-            //   bottom: 0,
-            //   right: 0,
-            //   left: 0,
-            //   child: Container(
-            //     color: Colors.white,
-            //     padding: const EdgeInsets.all(8.0),
-            //     child: Row(
-            //       mainAxisAlignment: MainAxisAlignment.end,
-            //       crossAxisAlignment: CrossAxisAlignment.center,
-            //       children: [
-            //         cancelButton(),
-            //         const SizedBox(
-            //           width: 10,
-            //         ),
-            //         saveButton()
-            //       ],
-            //     ),
-            //   ),
-            // )
           ],
         ),
       ),
@@ -683,27 +664,98 @@ class _InputPageState extends State<InputPage> {
               ],
             ),
             const Divider(),
+            const SizedBox(height: 20),
             Container(
                 padding: const EdgeInsets.all(10),
                 alignment: Alignment.center,
                 width: double.infinity,
                 color: Colors.blue,
                 child: const Text('Payment Options')),
+            StreamBuilder<int>(
+                stream: _selectedPayment$,
+                builder: (context, snapshot) {
+                  if (snapshot.data == null) {
+                    return const SizedBox();
+                  }
+                  final data = snapshot.data;
+                  return Column(
+                    children: [
+                      ListTile(
+                        onTap: () {
+                          if (data == 1) {
+                            _selectedPayment$.add(0);
+                            return;
+                          }
+                          _selectedPayment$.add(1);
+                        },
+                        title: Text('Pay to agent'),
+                        leading: data == 1
+                            ? Icon(Icons.circle_rounded, color: Colors.green)
+                            : Icon(Icons.circle_outlined),
+                        // subtitle: Text('09207433898'),
+                      ),
+                      const Divider(),
+                      ListTile(
+                        onTap: () {
+                          if (data == 2) {
+                            _selectedPayment$.add(0);
+                            return;
+                          }
+                          _selectedPayment$.add(2);
+                        },
+                        title: Text('GCASH'),
+                        subtitle: Text('09207433898'),
+                        leading: data == 2
+                            ? Icon(Icons.circle_rounded, color: Colors.green)
+                            : Icon(Icons.circle_outlined),
+                      ),
+                      const Divider(),
+                      ListTile(
+                        // trailing: Icon(Icons.),
+                        onTap: () {
+                          if (data == 3) {
+                            _selectedPayment$.add(0);
+                            return;
+                          }
+                          _selectedPayment$.add(3);
+                        },
+                        title: Text('Bank Transfer'),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text('Account:   Jet Estacion'),
+                            Text('Account #: 8885-5555-5555'),
+                          ],
+                        ),
+                        leading: data == 3
+                            ? Icon(Icons.circle_rounded, color: Colors.green)
+                            : Icon(Icons.circle_outlined),
+                      ),
+                      const Divider(),
+                      const SizedBox(height: 30),
+                    ],
+                  );
+                }),
             Column(
-              children: [],
-            ),
-            Padding(
-              padding: const EdgeInsets.all(25.0),
-              child: Column(
-                children: [
-                  const Text(
-                      '*Make sure to complete any of the payment options first'),
-                  Center(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  '*Process payment first before you send form',
+                  style: TextStyle(color: Colors.red),
+                ),
+                const SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.all(25.0),
+                  child: Center(
                       child: ElevatedButton(
                     style: TextButton.styleFrom(
                         backgroundColor: Colors.green,
                         padding: const EdgeInsets.all(15)),
                     onPressed: () {
+                      if (_selectedPayment$.value == 0) {
+                        showToast('No payment option selected');
+                        return;
+                      }
                       setInfo();
                     },
                     child: const Padding(
@@ -711,8 +763,8 @@ class _InputPageState extends State<InputPage> {
                       child: Text('Send Form', style: TextStyle(fontSize: 15)),
                     ),
                   )),
-                ],
-              ),
+                ),
+              ],
             )
           ],
         )
@@ -804,6 +856,10 @@ class _InputPageState extends State<InputPage> {
             _current$.add(index);
           }),
     );
+  }
+
+  showToast(String str) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(str)));
   }
 
   Widget textFieldChoice(TextEditingController ctrler, String labelText) {
