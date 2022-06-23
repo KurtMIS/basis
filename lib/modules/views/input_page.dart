@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -20,7 +22,7 @@ class InputPage extends StatefulWidget {
 }
 
 class _InputPageState extends State<InputPage> {
-  final input = locator.get<Input>();
+  final inputBloc = locator.get<Input>();
 
   final CarouselController carouselCtrler = CarouselController();
   final _formKey = GlobalKey<FormState>();
@@ -72,7 +74,7 @@ class _InputPageState extends State<InputPage> {
     if (!res) {
       return;
     }
-    input.setInfo(Info(
+    inputBloc.setInfo(Info(
         id: docIdFromCurrentDate() +
             stringToDate(dateOfBirth.text).toIso8601String(),
         presentAddress: presentAddress.text,
@@ -171,7 +173,7 @@ class _InputPageState extends State<InputPage> {
                             children: [
                               Text(
                                 pageTitles(val!),
-                                style: TextStyle(color: Colors.blue),
+                                style: const TextStyle(color: Colors.blue),
                               ),
                               pageIndicator(val),
                             ],
@@ -307,12 +309,90 @@ class _InputPageState extends State<InputPage> {
                 keyboardType: TextInputType.phone),
             textField(telNumber, 'Telephone Number',
                 keyboardType: TextInputType.phone),
-            textField(passportNumber, '*Passport Number',
-                keyboardType: TextInputType.number),
-            textFieldDate(
-              expiryDate,
-              '*Expiry Date',
-            ),
+            Container(
+                alignment: Alignment.center,
+                // constraints: const BoxConstraints(maxWidth: 300),
+                padding: const EdgeInsets.only(
+                  bottom: 20,
+                ),
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(15),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Passport'),
+                          const SizedBox(height: 20),
+                          // textField(passportNumber, '*Passport Number',
+                          //     keyboardType: TextInputType.number),
+                          // const SizedBox(height: 10),
+                          // textFieldDate(
+                          //   expiryDate,
+                          //   '*Expiry Date',
+                          // ),
+                          const SizedBox(height: 15),
+                          const Text('Attach image:'),
+                          // const SizedBox(
+                          //   height: 10,
+                          // ),
+                          Align(
+                            // alignment: Alignment.center,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                IconButton(
+                                  onPressed: () async {
+                                    await inputBloc.pickImage(false);
+                                  },
+                                  splashRadius: 30,
+                                  iconSize: 40,
+                                  padding: const EdgeInsets.all(30),
+                                  icon: const Icon(
+                                    Icons.image_outlined,
+                                    // textDirection: TextDirection.rtl,
+                                  ),
+                                ),
+                                // SizedBox(
+                                //   width: 40,
+                                // ),
+                                IconButton(
+                                  onPressed: () async {
+                                    await inputBloc.pickImage(true);
+                                  },
+                                  splashRadius: 30,
+                                  iconSize: 40,
+                                  padding: const EdgeInsets.all(30),
+                                  icon: const Icon(
+                                    Icons.camera_alt_outlined,
+                                    // textDirection: TextDirection.RTL,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Center(
+                            child: StreamBuilder<File>(
+                                stream: inputBloc.file$,
+                                builder: (context, snapshot) {
+                                  if (snapshot.data == null) {
+                                    return const SizedBox();
+                                  }
+                                  return const Center(
+                                      child: Icon(
+                                    Icons.check,
+                                    color: Colors.green,
+                                  ));
+                                }),
+                          ),
+                          const Text(
+                            '*Image must be clear',
+                            style: TextStyle(
+                                fontStyle: FontStyle.italic, color: Colors.red),
+                          )
+                        ]),
+                  ),
+                )),
             textField(sssNumber, 'SSS Number',
                 keyboardType: TextInputType.number),
             textField(tinNumber, 'TIN', keyboardType: TextInputType.number),

@@ -12,18 +12,18 @@ import 'package:firebase_core/firebase_core.dart' as firebase_core;
 
 class Input {
   final inputRepo = locator.get<InputRepo>();
-  final file = BehaviorSubject<File>();
+  final file$ = BehaviorSubject<File>();
   final picker = ImagePicker();
 
   Future<void> setInfo(Info req) async => await inputRepo.setInfo(req);
 
   pickImage(bool isCamera) async {
-    final pickedFile = await picker.getImage(
+    final pickedFile = await picker.pickImage(
         source: isCamera ? ImageSource.camera : ImageSource.gallery);
     if (pickedFile != null) {
       final File file2 = File(pickedFile.path);
       print('' + file2.path);
-      file.add(file2);
+      file$.add(file2);
     }
   }
 
