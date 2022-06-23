@@ -849,11 +849,11 @@ class _InputPageState extends State<InputPage> {
                                                           false,
                                                           inputBloc.bankFile$);
                                                     },
-                                                    splashRadius: 30,
-                                                    iconSize: 40,
+                                                    splashRadius: 25,
+                                                    iconSize: 30,
                                                     padding:
                                                         const EdgeInsets.all(
-                                                            30),
+                                                            15),
                                                     icon: const Icon(
                                                       Icons.image_outlined,
                                                       // textDirection: TextDirection.rtl,
@@ -868,11 +868,11 @@ class _InputPageState extends State<InputPage> {
                                                           true,
                                                           inputBloc.bankFile$);
                                                     },
-                                                    splashRadius: 30,
-                                                    iconSize: 40,
+                                                    splashRadius: 25,
+                                                    iconSize: 30,
                                                     padding:
                                                         const EdgeInsets.all(
-                                                            30),
+                                                            15),
                                                     icon: const Icon(
                                                       Icons.camera_alt_outlined,
                                                       // textDirection: TextDirection.RTL,

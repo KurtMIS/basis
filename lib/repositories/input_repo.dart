@@ -3,20 +3,23 @@ import 'package:stronghold_ofw/services/api.dart';
 
 import '../services/firestore.dart';
 import '../modules/models/info/info.dart';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-import 'package:firebase_core/firebase_core.dart' as firebase_core;
 
 class InputRepo {
-  // FirebaseUsers._();
-  // static final instance = FirebaseUsers._();
-  // final uid = Modular.get<AuthService>().getCurrentUserId();
-  // final uid = auth.getCurrentUserId();
   final _service = FirestoreService.instance;
+  CollectionReference info = FirebaseFirestore.instance.collection('info');
+  DocumentReference documentReference(String col, String doc) =>
+      FirebaseFirestore.instance.collection(col).doc(doc);
 
   Future<void> setInfo(Info req) async => await _service.setData(
         path: InfoApi.info(req.id),
         data: req.toJson(),
       );
+
+  Future<void> updateInfo(Info req, Map<String, dynamic> map) async =>
+      await documentReference('info', req.id)
+          .update(map)
+          .then((value) => print("Info Updated ${req.id}   $map"))
+          .catchError((error) => print("Failed to update user: $error"));
 
   Stream<List<Info>> users$() => _service.collectionStream(
         path: InfoApi.infos,
@@ -25,11 +28,9 @@ class InputRepo {
           return infos;
         },
         queryBuilder: (Query<Object?> query) {
-          print('query builder');
           return query.orderBy('id', descending: true);
         },
         sort: (Info first, Info second) {
-          print('sort?');
           return first.id.compareTo(second.id);
         },
       );

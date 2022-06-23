@@ -17,6 +17,8 @@ class Input {
   final picker = ImagePicker();
 
   Future<void> setInfo(Info req) async => await inputRepo.setInfo(req);
+  Future<void> updateInfo(Info req, Map<String, dynamic> map) async =>
+      await inputRepo.updateInfo(req, map);
 
   pickImage(bool isCamera, BehaviorSubject file) async {
     final pickedFile = await picker.pickImage(

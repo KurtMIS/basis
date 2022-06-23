@@ -31,7 +31,10 @@ class _ViewPageState extends State<ViewPage> {
               divided: true,
               snapshot: snapshot,
               itemBuilder: (context, data) {
+                print('iddddddddddddddddddddddddd${data.id}');
                 return ListTile(
+                  onTap: () async => await input
+                      .updateInfo(data, {'isPaid': true, 'isDone': true}),
                   title: Text(data.firstName),
                   subtitle: Text(data.dateOfBirth),
                 );
