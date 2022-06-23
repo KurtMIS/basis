@@ -322,7 +322,7 @@ class _InputPageState extends State<InputPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text('Passport'),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 15),
                           // textField(passportNumber, '*Passport Number',
                           //     keyboardType: TextInputType.number),
                           // const SizedBox(height: 10),
@@ -343,7 +343,8 @@ class _InputPageState extends State<InputPage> {
                               children: [
                                 IconButton(
                                   onPressed: () async {
-                                    await inputBloc.pickImage(false);
+                                    await inputBloc.pickImage(
+                                        false, inputBloc.file$);
                                   },
                                   splashRadius: 30,
                                   iconSize: 40,
@@ -358,7 +359,8 @@ class _InputPageState extends State<InputPage> {
                                 // ),
                                 IconButton(
                                   onPressed: () async {
-                                    await inputBloc.pickImage(true);
+                                    await inputBloc.pickImage(
+                                        true, inputBloc.file$);
                                   },
                                   splashRadius: 30,
                                   iconSize: 40,
@@ -802,9 +804,106 @@ class _InputPageState extends State<InputPage> {
                         title: Text('Bank Transfer'),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
+                          children: [
                             Text('Account:   Jet Estacion'),
                             Text('Account #: 8885-5555-5555'),
+                            if (data == 3)
+                              Container(
+                                  alignment: Alignment.center,
+                                  // constraints: const BoxConstraints(maxWidth: 300),
+                                  padding: const EdgeInsets.only(
+                                    bottom: 20,
+                                  ),
+                                  child: Card(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(15),
+                                      child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Text('Transaction Receipt'),
+                                            const SizedBox(height: 15),
+                                            // textField(passportNumber, '*Passport Number',
+                                            //     keyboardType: TextInputType.number),
+                                            // const SizedBox(height: 10),
+                                            // textFieldDate(
+                                            //   expiryDate,
+                                            //   '*Expiry Date',
+                                            // ),
+                                            const SizedBox(height: 15),
+                                            const Text('Attach image:'),
+                                            // const SizedBox(
+                                            //   height: 10,
+                                            // ),
+                                            Align(
+                                              // alignment: Alignment.center,
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  IconButton(
+                                                    onPressed: () async {
+                                                      await inputBloc.pickImage(
+                                                          false,
+                                                          inputBloc.bankFile$);
+                                                    },
+                                                    splashRadius: 30,
+                                                    iconSize: 40,
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            30),
+                                                    icon: const Icon(
+                                                      Icons.image_outlined,
+                                                      // textDirection: TextDirection.rtl,
+                                                    ),
+                                                  ),
+                                                  // SizedBox(
+                                                  //   width: 40,
+                                                  // ),
+                                                  IconButton(
+                                                    onPressed: () async {
+                                                      await inputBloc.pickImage(
+                                                          true,
+                                                          inputBloc.bankFile$);
+                                                    },
+                                                    splashRadius: 30,
+                                                    iconSize: 40,
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            30),
+                                                    icon: const Icon(
+                                                      Icons.camera_alt_outlined,
+                                                      // textDirection: TextDirection.RTL,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Center(
+                                              child: StreamBuilder<File>(
+                                                  stream: inputBloc.file$,
+                                                  builder: (context, snapshot) {
+                                                    if (snapshot.data == null) {
+                                                      return const SizedBox();
+                                                    }
+                                                    return const Center(
+                                                        child: Icon(
+                                                      Icons.check,
+                                                      color: Colors.green,
+                                                    ));
+                                                  }),
+                                            ),
+                                            const Text(
+                                              '*Image must be clear',
+                                              style: TextStyle(
+                                                  fontStyle: FontStyle.italic,
+                                                  color: Colors.red),
+                                            )
+                                          ]),
+                                    ),
+                                  )),
                           ],
                         ),
                         leading: data == 3
