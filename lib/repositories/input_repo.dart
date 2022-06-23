@@ -16,12 +16,9 @@ class InputRepo {
       );
 
   Future<void> updateInfo(Info req, Map<String, dynamic> map) async =>
-      await documentReference('info', req.id)
-          .update(map)
-          .then((value) => print("Info Updated ${req.id}   $map"))
-          .catchError((error) => print("Failed to update user: $error"));
+      await documentReference('info', req.id).update(map);
 
-  Stream<List<Info>> users$() => _service.collectionStream(
+  Stream<List<Info>> getInfos$() => _service.collectionStream(
         path: InfoApi.infos,
         builder: (data, documentId) {
           Info infos = Info.fromJson(data);
@@ -29,6 +26,29 @@ class InputRepo {
         },
         queryBuilder: (Query<Object?> query) {
           return query.orderBy('id', descending: true);
+        },
+        sort: (Info first, Info second) {
+          return first.id.compareTo(second.id);
+        },
+      );
+
+  Stream<List<Info>> searchInfo$(Info info) => _service.collectionStream(
+        path: InfoApi.infos,
+        builder: (data, documentId) {
+          Info infos = Info.fromJson(data);
+          return infos;
+        },
+        queryBuilder: (Query<Object?> query) {
+          return query
+              .where(
+                'mobileNumber',
+                isEqualTo: info.mobileNumber,
+              )
+              .where('isPaid', isEqualTo: info.isPaid)
+              .where('isDone', isEqualTo: info.isDone)
+              .where('submissionDate', isEqualTo: info.submissionDate)
+              .where('processDate', isEqualTo: info.processedDate)
+              .where('dateOfBirth', isEqualTo: info.dateOfBirth);
         },
         sort: (Info first, Info second) {
           return first.id.compareTo(second.id);

@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
-import '../dependent/dependent.dart';
 
 part 'info.freezed.dart';
 part 'info.g.dart';
@@ -42,6 +41,11 @@ class Info with _$Info {
     @Default('') String occupation,
     @Default(false) bool isPaid,
     @Default(false) bool isDone,
+    @Default('') String paymentMethod,
+    @Default('') String passportImagePath,
+    @Default('') String receiptImagePath,
+    @Default('') String submissionDate,
+    @Default('') String processedDate,
   }) = _Info;
 
   factory Info.fromJson(Map<String, dynamic> json) => _$InfoFromJson(json);

@@ -44,6 +44,11 @@ _$_Info _$$_InfoFromJson(Map<String, dynamic> json) => _$_Info(
       occupation: json['occupation'] as String? ?? '',
       isPaid: json['isPaid'] as bool? ?? false,
       isDone: json['isDone'] as bool? ?? false,
+      paymentMethod: json['paymentMethod'] as String? ?? '',
+      passportImagePath: json['passportImagePath'] as String? ?? '',
+      receiptImagePath: json['receiptImagePath'] as String? ?? '',
+      submissionDate: json['submissionDate'] as String? ?? '',
+      processedDate: json['processedDate'] as String? ?? '',
     );
 
 Map<String, dynamic> _$$_InfoToJson(_$_Info instance) => <String, dynamic>{
@@ -81,4 +86,9 @@ Map<String, dynamic> _$$_InfoToJson(_$_Info instance) => <String, dynamic>{
       'occupation': instance.occupation,
       'isPaid': instance.isPaid,
       'isDone': instance.isDone,
+      'paymentMethod': instance.paymentMethod,
+      'passportImagePath': instance.passportImagePath,
+      'receiptImagePath': instance.receiptImagePath,
+      'submissionDate': instance.submissionDate,
+      'processedDate': instance.processedDate,
     };

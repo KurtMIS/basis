@@ -55,6 +55,11 @@ mixin _$Info {
   String get occupation => throw _privateConstructorUsedError;
   bool get isPaid => throw _privateConstructorUsedError;
   bool get isDone => throw _privateConstructorUsedError;
+  String get paymentMethod => throw _privateConstructorUsedError;
+  String get passportImagePath => throw _privateConstructorUsedError;
+  String get receiptImagePath => throw _privateConstructorUsedError;
+  String get submissionDate => throw _privateConstructorUsedError;
+  String get processedDate => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -99,7 +104,12 @@ abstract class $InfoCopyWith<$Res> {
       String dateOfEmployment,
       String occupation,
       bool isPaid,
-      bool isDone});
+      bool isDone,
+      String paymentMethod,
+      String passportImagePath,
+      String receiptImagePath,
+      String submissionDate,
+      String processedDate});
 }
 
 /// @nodoc
@@ -146,6 +156,11 @@ class _$InfoCopyWithImpl<$Res> implements $InfoCopyWith<$Res> {
     Object? occupation = freezed,
     Object? isPaid = freezed,
     Object? isDone = freezed,
+    Object? paymentMethod = freezed,
+    Object? passportImagePath = freezed,
+    Object? receiptImagePath = freezed,
+    Object? submissionDate = freezed,
+    Object? processedDate = freezed,
   }) {
     return _then(_value.copyWith(
       id: id == freezed
@@ -284,6 +299,26 @@ class _$InfoCopyWithImpl<$Res> implements $InfoCopyWith<$Res> {
           ? _value.isDone
           : isDone // ignore: cast_nullable_to_non_nullable
               as bool,
+      paymentMethod: paymentMethod == freezed
+          ? _value.paymentMethod
+          : paymentMethod // ignore: cast_nullable_to_non_nullable
+              as String,
+      passportImagePath: passportImagePath == freezed
+          ? _value.passportImagePath
+          : passportImagePath // ignore: cast_nullable_to_non_nullable
+              as String,
+      receiptImagePath: receiptImagePath == freezed
+          ? _value.receiptImagePath
+          : receiptImagePath // ignore: cast_nullable_to_non_nullable
+              as String,
+      submissionDate: submissionDate == freezed
+          ? _value.submissionDate
+          : submissionDate // ignore: cast_nullable_to_non_nullable
+              as String,
+      processedDate: processedDate == freezed
+          ? _value.processedDate
+          : processedDate // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -327,7 +362,12 @@ abstract class _$$_InfoCopyWith<$Res> implements $InfoCopyWith<$Res> {
       String dateOfEmployment,
       String occupation,
       bool isPaid,
-      bool isDone});
+      bool isDone,
+      String paymentMethod,
+      String passportImagePath,
+      String receiptImagePath,
+      String submissionDate,
+      String processedDate});
 }
 
 /// @nodoc
@@ -375,6 +415,11 @@ class __$$_InfoCopyWithImpl<$Res> extends _$InfoCopyWithImpl<$Res>
     Object? occupation = freezed,
     Object? isPaid = freezed,
     Object? isDone = freezed,
+    Object? paymentMethod = freezed,
+    Object? passportImagePath = freezed,
+    Object? receiptImagePath = freezed,
+    Object? submissionDate = freezed,
+    Object? processedDate = freezed,
   }) {
     return _then(_$_Info(
       id: id == freezed
@@ -513,6 +558,26 @@ class __$$_InfoCopyWithImpl<$Res> extends _$InfoCopyWithImpl<$Res>
           ? _value.isDone
           : isDone // ignore: cast_nullable_to_non_nullable
               as bool,
+      paymentMethod: paymentMethod == freezed
+          ? _value.paymentMethod
+          : paymentMethod // ignore: cast_nullable_to_non_nullable
+              as String,
+      passportImagePath: passportImagePath == freezed
+          ? _value.passportImagePath
+          : passportImagePath // ignore: cast_nullable_to_non_nullable
+              as String,
+      receiptImagePath: receiptImagePath == freezed
+          ? _value.receiptImagePath
+          : receiptImagePath // ignore: cast_nullable_to_non_nullable
+              as String,
+      submissionDate: submissionDate == freezed
+          ? _value.submissionDate
+          : submissionDate // ignore: cast_nullable_to_non_nullable
+              as String,
+      processedDate: processedDate == freezed
+          ? _value.processedDate
+          : processedDate // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -554,7 +619,12 @@ class _$_Info with DiagnosticableTreeMixin implements _Info {
       this.dateOfEmployment = '',
       this.occupation = '',
       this.isPaid = false,
-      this.isDone = false})
+      this.isDone = false,
+      this.paymentMethod = '',
+      this.passportImagePath = '',
+      this.receiptImagePath = '',
+      this.submissionDate = '',
+      this.processedDate = ''})
       : _dependents = dependents;
 
   factory _$_Info.fromJson(Map<String, dynamic> json) => _$$_InfoFromJson(json);
@@ -666,10 +736,25 @@ class _$_Info with DiagnosticableTreeMixin implements _Info {
   @override
   @JsonKey()
   final bool isDone;
+  @override
+  @JsonKey()
+  final String paymentMethod;
+  @override
+  @JsonKey()
+  final String passportImagePath;
+  @override
+  @JsonKey()
+  final String receiptImagePath;
+  @override
+  @JsonKey()
+  final String submissionDate;
+  @override
+  @JsonKey()
+  final String processedDate;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Info(id: $id, lastName: $lastName, firstName: $firstName, middleName: $middleName, presentAddress: $presentAddress, provincialAddress: $provincialAddress, dateOfBirth: $dateOfBirth, placeOfBirth: $placeOfBirth, nationality: $nationality, gender: $gender, religion: $religion, civilStatus: $civilStatus, email: $email, mobileNumber: $mobileNumber, telNumber: $telNumber, passportNumber: $passportNumber, expiryDate: $expiryDate, sssNumber: $sssNumber, tinNumber: $tinNumber, dependents: $dependents, agent: $agent, employer: $employer, address: $address, termOfContract: $termOfContract, position: $position, effectiveDate: $effectiveDate, recruitmentAgency: $recruitmentAgency, employmentContactNumber: $employmentContactNumber, natureOfBusiness: $natureOfBusiness, countryOfDeployment: $countryOfDeployment, dateOfEmployment: $dateOfEmployment, occupation: $occupation, isPaid: $isPaid, isDone: $isDone)';
+    return 'Info(id: $id, lastName: $lastName, firstName: $firstName, middleName: $middleName, presentAddress: $presentAddress, provincialAddress: $provincialAddress, dateOfBirth: $dateOfBirth, placeOfBirth: $placeOfBirth, nationality: $nationality, gender: $gender, religion: $religion, civilStatus: $civilStatus, email: $email, mobileNumber: $mobileNumber, telNumber: $telNumber, passportNumber: $passportNumber, expiryDate: $expiryDate, sssNumber: $sssNumber, tinNumber: $tinNumber, dependents: $dependents, agent: $agent, employer: $employer, address: $address, termOfContract: $termOfContract, position: $position, effectiveDate: $effectiveDate, recruitmentAgency: $recruitmentAgency, employmentContactNumber: $employmentContactNumber, natureOfBusiness: $natureOfBusiness, countryOfDeployment: $countryOfDeployment, dateOfEmployment: $dateOfEmployment, occupation: $occupation, isPaid: $isPaid, isDone: $isDone, paymentMethod: $paymentMethod, passportImagePath: $passportImagePath, receiptImagePath: $receiptImagePath, submissionDate: $submissionDate, processedDate: $processedDate)';
   }
 
   @override
@@ -711,7 +796,12 @@ class _$_Info with DiagnosticableTreeMixin implements _Info {
       ..add(DiagnosticsProperty('dateOfEmployment', dateOfEmployment))
       ..add(DiagnosticsProperty('occupation', occupation))
       ..add(DiagnosticsProperty('isPaid', isPaid))
-      ..add(DiagnosticsProperty('isDone', isDone));
+      ..add(DiagnosticsProperty('isDone', isDone))
+      ..add(DiagnosticsProperty('paymentMethod', paymentMethod))
+      ..add(DiagnosticsProperty('passportImagePath', passportImagePath))
+      ..add(DiagnosticsProperty('receiptImagePath', receiptImagePath))
+      ..add(DiagnosticsProperty('submissionDate', submissionDate))
+      ..add(DiagnosticsProperty('processedDate', processedDate));
   }
 
   @override
@@ -771,7 +861,17 @@ class _$_Info with DiagnosticableTreeMixin implements _Info {
             const DeepCollectionEquality()
                 .equals(other.occupation, occupation) &&
             const DeepCollectionEquality().equals(other.isPaid, isPaid) &&
-            const DeepCollectionEquality().equals(other.isDone, isDone));
+            const DeepCollectionEquality().equals(other.isDone, isDone) &&
+            const DeepCollectionEquality()
+                .equals(other.paymentMethod, paymentMethod) &&
+            const DeepCollectionEquality()
+                .equals(other.passportImagePath, passportImagePath) &&
+            const DeepCollectionEquality()
+                .equals(other.receiptImagePath, receiptImagePath) &&
+            const DeepCollectionEquality()
+                .equals(other.submissionDate, submissionDate) &&
+            const DeepCollectionEquality()
+                .equals(other.processedDate, processedDate));
   }
 
   @JsonKey(ignore: true)
@@ -811,7 +911,12 @@ class _$_Info with DiagnosticableTreeMixin implements _Info {
         const DeepCollectionEquality().hash(dateOfEmployment),
         const DeepCollectionEquality().hash(occupation),
         const DeepCollectionEquality().hash(isPaid),
-        const DeepCollectionEquality().hash(isDone)
+        const DeepCollectionEquality().hash(isDone),
+        const DeepCollectionEquality().hash(paymentMethod),
+        const DeepCollectionEquality().hash(passportImagePath),
+        const DeepCollectionEquality().hash(receiptImagePath),
+        const DeepCollectionEquality().hash(submissionDate),
+        const DeepCollectionEquality().hash(processedDate)
       ]);
 
   @JsonKey(ignore: true)
@@ -860,7 +965,12 @@ abstract class _Info implements Info {
       final String dateOfEmployment,
       final String occupation,
       final bool isPaid,
-      final bool isDone}) = _$_Info;
+      final bool isDone,
+      final String paymentMethod,
+      final String passportImagePath,
+      final String receiptImagePath,
+      final String submissionDate,
+      final String processedDate}) = _$_Info;
 
   factory _Info.fromJson(Map<String, dynamic> json) = _$_Info.fromJson;
 
@@ -933,6 +1043,16 @@ abstract class _Info implements Info {
   bool get isPaid => throw _privateConstructorUsedError;
   @override
   bool get isDone => throw _privateConstructorUsedError;
+  @override
+  String get paymentMethod => throw _privateConstructorUsedError;
+  @override
+  String get passportImagePath => throw _privateConstructorUsedError;
+  @override
+  String get receiptImagePath => throw _privateConstructorUsedError;
+  @override
+  String get submissionDate => throw _privateConstructorUsedError;
+  @override
+  String get processedDate => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
   _$$_InfoCopyWith<_$_Info> get copyWith => throw _privateConstructorUsedError;

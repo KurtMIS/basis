@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../services/locator.dart';
 import '../logics/input.dart';
+import '../logics/view.dart';
 import '../models/info/info.dart';
 import '../shared_widgets/lists.dart';
 
@@ -13,7 +14,7 @@ class ViewPage extends StatefulWidget {
 }
 
 class _ViewPageState extends State<ViewPage> {
-  final input = locator.get<Input>();
+  final view = locator.get<View>();
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +23,7 @@ class _ViewPageState extends State<ViewPage> {
 
   Widget list() {
     return StreamBuilder<List<Info>>(
-        stream: input.inputRepo.users$(),
+        stream: view.getInfos(Info()),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -31,10 +32,9 @@ class _ViewPageState extends State<ViewPage> {
               divided: true,
               snapshot: snapshot,
               itemBuilder: (context, data) {
-                print('iddddddddddddddddddddddddd${data.id}');
                 return ListTile(
-                  onTap: () async => await input
-                      .updateInfo(data, {'isPaid': true, 'isDone': true}),
+                  // onTap: () async => await view
+                  // .setInfo(data.copyWith(isPaid: true, isDone: true)),
                   title: Text(data.firstName),
                   subtitle: Text(data.dateOfBirth),
                 );
