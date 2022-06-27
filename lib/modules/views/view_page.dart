@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../services/locator.dart';
-import '../logics/input.dart';
 import '../logics/view.dart';
 import '../models/info/info.dart';
 import '../shared_widgets/lists.dart';
