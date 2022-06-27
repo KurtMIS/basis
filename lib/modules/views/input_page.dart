@@ -67,8 +67,9 @@ class _InputPageState extends State<InputPage> {
   final sharingDependent = TextEditingController();
   final revocableDependent = TextEditingController();
   final paymentMethod = '';
-  final passportImagePath = '';
-  final receiptImagePath = '';
+  var passportImagePath = '';
+  var receiptImagePath = '';
+  var id = '';
   String docIdFromCurrentDate() => DateTime.now().toIso8601String();
 
   void setInfo() async {
@@ -78,8 +79,7 @@ class _InputPageState extends State<InputPage> {
       return;
     }
     inputBloc.setInfo(Info(
-        id: docIdFromCurrentDate() +
-            stringToDate(dateOfBirth.text).toIso8601String(),
+        id: id,
         presentAddress: presentAddress.text,
         agent: agent.text,
         civilStatus: civilStatus.text,
@@ -112,42 +112,45 @@ class _InputPageState extends State<InputPage> {
         tinNumber: tinNumber.text,
         isDone: false,
         isPaid: false,
-        passportImagePath: ''));
+        passportImagePath: '',
+        paymentMethod: _selectedPayment$.value.toString(),
+        submissionDate: DateFormat('dd/MM/yyyy').format(DateTime.now()),
+        receiptImagePath: ''));
   }
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      // presentAddress.text = 'presentAddress';
-      // agent.text = 'agent';
-      // civilStatus.text = 'civilStatus';
-      // countryOfDeployment.text = 'countryOfDeployment';
-      // dateOfBirth.text = '10/10/1988';
-      // employmentDate.text = '22/06/2021';
-      // email.text = 'email';
-      // effectiveDate.text = '22/07/2022';
-      // employerName.text = 'employerName';
-      // employmentContactNumber.text = 'employmentContactNumber';
-      // expiryDate.text = '10/05/2025';
-      // firstName.text = 'firstName';
-      // gender.text = 'male';
-      // lastName.text = 'lastname';
-      // middleName.text = 'middleNAME';
-      // mobileNumber.text = '12345678';
-      // nationality.text = 'nationality';
-      // natureOfBusiness.text = 'natureOfBusiness';
-      // passportNumber.text = '111111111111';
-      // placeOfBirth.text = 'placeofbirth';
-      // position.text = 'position';
-      // employerAddress.text = 'employerAddress';
-      // provincialAddress.text = 'provincialAddress';
-      // recruitmentAgency.text = 'recruitmentAgency';
-      // religion.text = 'religion';
-      // sssNumber.text = 'sssNumber';
-      // telNumber.text = 'telNumber';
-      // termOfContract.text = 'termOfContract';
-      // tinNumber.text = 'tinNumber';
+      presentAddress.text = 'presentAddress';
+      agent.text = 'agent';
+      civilStatus.text = 'civilStatus';
+      countryOfDeployment.text = 'countryOfDeployment';
+      dateOfBirth.text = '10/10/1988';
+      employmentDate.text = '22/06/2021';
+      email.text = 'email';
+      effectiveDate.text = '22/06/2022';
+      employerName.text = 'employerName';
+      employmentContactNumber.text = 'employmentContactNumber';
+      expiryDate.text = '10/05/2025';
+      firstName.text = 'firstName';
+      gender.text = 'male';
+      lastName.text = 'lastname';
+      middleName.text = 'middleNAME';
+      mobileNumber.text = '12345678';
+      nationality.text = 'nationality';
+      natureOfBusiness.text = 'natureOfBusiness';
+      passportNumber.text = '111111111111';
+      placeOfBirth.text = 'placeofbirth';
+      position.text = 'position';
+      employerAddress.text = 'employerAddress';
+      provincialAddress.text = 'provincialAddress';
+      recruitmentAgency.text = 'recruitmentAgency';
+      religion.text = 'religion';
+      sssNumber.text = 'sssNumber';
+      telNumber.text = 'telNumber';
+      termOfContract.text = 'termOfContract';
+      tinNumber.text = 'tinNumber';
     });
   }
 
@@ -308,7 +311,8 @@ class _InputPageState extends State<InputPage> {
             textField(civilStatus, '*Civil Status', hintText: 'Single/Married'),
             textField(email, '*E-mail Address',
                 hintText: 'delacruz@gmail.com',
-                keyboardType: TextInputType.emailAddress),
+                keyboardType: TextInputType.emailAddress,
+                onChanged: 'test'),
             textField(mobileNumber, 'Mobile Number',
                 keyboardType: TextInputType.phone),
             textField(telNumber, 'Telephone Number',
@@ -321,12 +325,13 @@ class _InputPageState extends State<InputPage> {
                 ),
                 child: Card(
                   child: Padding(
-                    padding: const EdgeInsets.all(15),
+                    padding: const EdgeInsets.all(7),
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Passport'),
-                          const SizedBox(height: 15),
+                          const Text('Passport',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 5),
                           // textField(passportNumber, '*Passport Number',
                           //     keyboardType: TextInputType.number),
                           // const SizedBox(height: 10),
@@ -348,7 +353,7 @@ class _InputPageState extends State<InputPage> {
                                 IconButton(
                                   onPressed: () async {
                                     await inputBloc.pickImage(
-                                        false, inputBloc.file$);
+                                        false, id, 'passport');
                                   },
                                   splashRadius: 30,
                                   iconSize: 40,
@@ -364,7 +369,7 @@ class _InputPageState extends State<InputPage> {
                                 IconButton(
                                   onPressed: () async {
                                     await inputBloc.pickImage(
-                                        true, inputBloc.file$);
+                                        true, id, 'passport');
                                   },
                                   splashRadius: 30,
                                   iconSize: 40,
@@ -849,9 +854,9 @@ class _InputPageState extends State<InputPage> {
                                                 children: [
                                                   IconButton(
                                                     onPressed: () async {
-                                                      await inputBloc.pickImage(
-                                                          false,
-                                                          inputBloc.bankFile$);
+                                                      // await inputBloc.pickImage(
+                                                      //     false,
+                                                      //     inputBloc.bankFile$);
                                                     },
                                                     splashRadius: 25,
                                                     iconSize: 30,
@@ -868,9 +873,9 @@ class _InputPageState extends State<InputPage> {
                                                   // ),
                                                   IconButton(
                                                     onPressed: () async {
-                                                      await inputBloc.pickImage(
-                                                          true,
-                                                          inputBloc.bankFile$);
+                                                      // await inputBloc.pickImage(
+                                                      //     true,
+                                                      //     inputBloc.bankFile$);
                                                     },
                                                     splashRadius: 25,
                                                     iconSize: 30,
@@ -987,7 +992,10 @@ class _InputPageState extends State<InputPage> {
   }
 
   Widget textField(TextEditingController ctrler, String labelText,
-      {bool? readOnly, TextInputType? keyboardType, String? hintText}) {
+      {bool? readOnly,
+      TextInputType? keyboardType,
+      String? hintText,
+      String? onChanged}) {
     return TextFieldShared(
       constraints: isWeb(context) ? const BoxConstraints(maxWidth: 300) : null,
       ctrler: ctrler,
@@ -995,6 +1003,11 @@ class _InputPageState extends State<InputPage> {
       hintText: hintText,
       readOnly: readOnly ?? false,
       keyboardType: keyboardType,
+      onChanged: (str) {
+        if (onChanged != null) {
+          id = docIdFromCurrentDate() + email.text;
+        }
+      },
     );
   }
 

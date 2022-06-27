@@ -39,16 +39,27 @@ class InputRepo {
           return infos;
         },
         queryBuilder: (Query<Object?> query) {
-          return query
-              .where(
-                'mobileNumber',
-                isEqualTo: info.mobileNumber,
-              )
-              .where('isPaid', isEqualTo: info.isPaid)
-              .where('isDone', isEqualTo: info.isDone)
-              .where('submissionDate', isEqualTo: info.submissionDate)
-              .where('processDate', isEqualTo: info.processedDate)
-              .where('dateOfBirth', isEqualTo: info.dateOfBirth);
+          // return query;
+          if (info.mobileNumber.isNotEmpty) {
+            query = query.where(
+              'mobileNumber',
+              isEqualTo: info.mobileNumber,
+            );
+          }
+          if (info.submissionDate.isNotEmpty) {
+            query =
+                query.where('submissionDate', isEqualTo: info.submissionDate);
+          }
+
+          // if (info.processedDate) {
+          // query = query.where('submissionDate', isEqualTo: info.submissionDate);
+          // }
+
+          query = query.where('isPaid', isEqualTo: info.isPaid);
+          // .where('isDone', isEqualTo: info.isDone)
+
+          // .where('dateOfBirth', isEqualTo: info.dateOfBirth);
+          return query;
         },
         sort: (Info first, Info second) {
           return first.id.compareTo(second.id);

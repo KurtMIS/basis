@@ -20,60 +20,11 @@ class Input {
   Future<void> updateInfo(Info req, Map<String, dynamic> map) async =>
       await inputRepo.updateInfo(req, map);
 
-  pickImage(bool isCamera, BehaviorSubject file) async {
-    final pickedFile = await picker.pickImage(
-        source: isCamera ? ImageSource.camera : ImageSource.gallery);
-    if (pickedFile != null) {
-      final File file2 = File(pickedFile.path);
-      print('' + file2.path);
-      file$.add(file2);
-    }
-  }
-
-  Future<String> downloadImage(String imagePath) async {
-    final link = await firebase_storage.FirebaseStorage.instance
-        .ref('uberLocations/$imagePath.jpg')
-        .getDownloadURL();
-    return link;
-  }
-
-  Future<void> sendImage() async {
-    final result = await picker.getImage(
-      source: ImageSource.gallery,
-      imageQuality: 80,
-      maxHeight: 400,
-      maxWidth: 400,
-    );
-    if (result != null) {
-      final File file = File(
-        result.path,
-      );
-      // ChatMessage message;
-      // String id = appId;
-
-      // final imageSent = await uploadImage(
-      //     folderName: 'chat', file: file, imageName: id);
-      // await imageSent.then((x) async {
-      //   final imagePath = await downloadImage(id);
-
-      // message = ChatMessage(
-      //     id: Uuid().v4(),
-      //     text: "",
-      //     user: myInfo,
-      //     image: imagePath,
-      //     createdAt: await mainBloc.getDateNowNTP());
-      // addMessage(message);
-      // });
-    } else {
-      return null;
-    }
-  }
-
   Future<firebase_storage.UploadTask> uploadImage<T>(
       {required String folderName,
       required String imageName,
       required File file,
-      required String url}) async {
+      String? url}) async {
     // if (file == null) {
     // await Fluttertoast.showToast(
     //     msg: "File not found",
@@ -124,5 +75,65 @@ class Input {
     //     textColor: Colors.white,
     //     fontSize: 16.0);
     return Future.value(uploadTask);
+  }
+
+  pickImage(bool isCamera, String id, String folderName) async {
+    final pickedFile = await picker.pickImage(
+        source: isCamera ? ImageSource.camera : ImageSource.gallery);
+    if (pickedFile != null) {
+      final File file2 = File(pickedFile.path);
+      print('first');
+      print('' + file2.path);
+      print('second');
+      // if(kIsWeb) {
+      // final res = await sendImage(id, file2, folderName);
+      // }
+      final res = await sendImage(id, file2, folderName);
+      print('third');
+      // if (res != '') {
+      file$.add(file2);
+      // }
+    }
+  }
+
+  Future<String> downloadImage(String imagePath) async {
+    final link = await firebase_storage.FirebaseStorage.instance
+        .ref('passport/$imagePath.jpg')
+        .getDownloadURL();
+    return link;
+  }
+
+  Future<String> sendImage(String id, File file, String folderName) async {
+    // final result = await picker.pickImage(
+    //   source: ImageSource.gallery,
+    //   imageQuality: 80,
+    //   // maxHeight: 400,
+    //   // maxWidth: 400,
+    // );
+    // if (result != null) {
+    //   final File file = File(
+    //     result.path,
+    //   );
+    // ChatMessage message;
+    // String id = appId;
+
+    final imageSent =
+        await uploadImage(folderName: folderName, file: file, imageName: id);
+    print('1');
+    var imagePath = '';
+    await imageSent.then((x) async {
+      imagePath = await downloadImage(id);
+      print('2');
+      // message = ChatMessage(
+      //     id: Uuid().v4(),
+      //     text: "",
+      //     user: myInfo,
+      //     image: imagePath,
+      //     createdAt: await mainBloc.getDateNowNTP());
+      // addMessage(message);
+      // });
+    }).whenComplete(() => imagePath);
+    print('3');
+    return imagePath;
   }
 }

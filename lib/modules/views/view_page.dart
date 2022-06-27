@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../services/locator.dart';
 import '../logics/view.dart';
@@ -21,23 +22,35 @@ class _ViewPageState extends State<ViewPage> {
   }
 
   Widget list() {
-    return StreamBuilder<List<Info>>(
-        stream: view.getInfos(Info()),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          return ListItemsBuilder<Info>(
-              divided: true,
-              snapshot: snapshot,
-              itemBuilder: (context, data) {
-                return ListTile(
-                  // onTap: () async => await view
-                  // .setInfo(data.copyWith(isPaid: true, isDone: true)),
-                  title: Text(data.firstName),
-                  subtitle: Text(data.dateOfBirth),
-                );
-              });
-        });
+    return Column(
+      children: [
+        Row(
+          children: [],
+        ),
+        StreamBuilder<List<Info>>(
+            stream: view.getInfos(Info(
+                isPaid: false,
+                isDone: false,
+                mobileNumber: '',
+                submissionDate: DateFormat('dd/MM/yyyy')
+                    .format(DateTime.now().subtract(const Duration(days: 3))))),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              return ListItemsBuilder<Info>(
+                  divided: true,
+                  snapshot: snapshot,
+                  itemBuilder: (context, data) {
+                    return ListTile(
+                      // onTap: () async => await view
+                      // .setInfo(data.copyWith(isPaid: true, isDone: true)),
+                      title: Text(data.firstName),
+                      subtitle: Text(data.dateOfBirth),
+                    );
+                  });
+            }),
+      ],
+    );
   }
 }
