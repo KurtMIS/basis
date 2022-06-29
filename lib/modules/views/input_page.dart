@@ -79,46 +79,46 @@ class _InputPageState extends State<InputPage> {
     if (!res) {
       return;
     }
-    // await inputBloc.setInfo(
-    //     Info(
-    //         id: id,
-    //         presentAddress: presentAddress.text,
-    //         agent: agent.text,
-    //         civilStatus: civilStatus.text,
-    //         countryOfDeployment: countryOfDeployment.text,
-    //         dateOfBirth: dateOfBirth.text,
-    //         dateOfEmployment: employmentDate.text,
-    //         dependents: _dependents.value.map((e) => e.toJson()).toList(),
-    //         email: email.text,
-    //         effectiveDate: effectiveDate.text,
-    //         employer: employerName.text,
-    //         employmentContactNumber: employmentContactNumber.text,
-    //         expiryDate: expiryDate.text,
-    //         firstName: firstName.text,
-    //         gender: gender.text,
-    //         lastName: lastName.text,
-    //         middleName: middleName.text,
-    //         mobileNumber: mobileNumber.text,
-    //         nationality: nationality.text,
-    //         natureOfBusiness: natureOfBusiness.text,
-    //         passportNumber: passportNumber.text,
-    //         placeOfBirth: placeOfBirth.text,
-    //         position: position.text,
-    //         address: employerAddress.text,
-    //         provincialAddress: provincialAddress.text,
-    //         recruitmentAgency: recruitmentAgency.text,
-    //         religion: religion.text,
-    //         sssNumber: sssNumber.text,
-    //         telNumber: telNumber.text,
-    //         termOfContract: termOfContract.text,
-    //         tinNumber: tinNumber.text,
-    //         isDone: false,
-    //         isPaid: false,
-    //         passportImagePath: passportImagePath,
-    //         paymentMethod: _selectedPayment$.value.toString(),
-    //         submissionDate: DateFormat('dd/MM/yyyy').format(DateTime.now()),
-    //         receiptImagePath: receiptImagePath),
-    //     context);
+    await inputBloc.setInfo(
+        Info(
+            id: id,
+            presentAddress: presentAddress.text,
+            agent: agent.text,
+            civilStatus: civilStatus.text,
+            countryOfDeployment: countryOfDeployment.text,
+            dateOfBirth: dateOfBirth.text,
+            dateOfEmployment: employmentDate.text,
+            dependents: _dependents.value.map((e) => e.toJson()).toList(),
+            email: email.text,
+            effectiveDate: effectiveDate.text,
+            employer: employerName.text,
+            employmentContactNumber: employmentContactNumber.text,
+            expiryDate: expiryDate.text,
+            firstName: firstName.text,
+            gender: gender.text,
+            lastName: lastName.text,
+            middleName: middleName.text,
+            mobileNumber: mobileNumber.text,
+            nationality: nationality.text,
+            natureOfBusiness: natureOfBusiness.text,
+            passportNumber: passportNumber.text,
+            placeOfBirth: placeOfBirth.text,
+            position: position.text,
+            address: employerAddress.text,
+            provincialAddress: provincialAddress.text,
+            recruitmentAgency: recruitmentAgency.text,
+            religion: religion.text,
+            sssNumber: sssNumber.text,
+            telNumber: telNumber.text,
+            termOfContract: termOfContract.text,
+            tinNumber: tinNumber.text,
+            isDone: false,
+            isPaid: false,
+            passportImagePath: passportImagePath,
+            paymentMethod: _selectedPayment$.value.toString(),
+            submissionDate: DateFormat('dd/MM/yyyy').format(DateTime.now()),
+            receiptImagePath: receiptImagePath),
+        context);
     Navigator.pushReplacementNamed(context, 'done');
   }
 
@@ -126,35 +126,35 @@ class _InputPageState extends State<InputPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      presentAddress.text = 'presentAddress';
-      agent.text = 'agent';
-      civilStatus.text = 'civilStatus';
-      countryOfDeployment.text = 'countryOfDeployment';
-      dateOfBirth.text = '10/10/1988';
-      employmentDate.text = '22/06/2021';
-      email.text = 'email';
-      effectiveDate.text = '22/06/2022';
-      employerName.text = 'employerName';
-      employmentContactNumber.text = 'employmentContactNumber';
-      expiryDate.text = '10/05/2025';
-      firstName.text = 'firstName';
-      gender.text = 'male';
-      lastName.text = 'lastname';
-      middleName.text = 'middleNAME';
-      mobileNumber.text = '12345678';
-      nationality.text = 'nationality';
-      natureOfBusiness.text = 'natureOfBusiness';
-      passportNumber.text = '111111111111';
-      placeOfBirth.text = 'placeofbirth';
-      position.text = 'position';
-      employerAddress.text = 'employerAddress';
-      provincialAddress.text = 'provincialAddress';
-      recruitmentAgency.text = 'recruitmentAgency';
-      religion.text = 'religion';
-      sssNumber.text = 'sssNumber';
-      telNumber.text = 'telNumber';
-      termOfContract.text = 'termOfContract';
-      tinNumber.text = 'tinNumber';
+      // presentAddress.text = 'presentAddress';
+      // agent.text = 'agent';
+      // civilStatus.text = 'civilStatus';
+      // countryOfDeployment.text = 'countryOfDeployment';
+      // dateOfBirth.text = '10/10/1988';
+      // employmentDate.text = '22/06/2021';
+      // email.text = 'email';
+      // effectiveDate.text = '22/06/2022';
+      // employerName.text = 'employerName';
+      // employmentContactNumber.text = 'employmentContactNumber';
+      // expiryDate.text = '10/05/2025';
+      // firstName.text = 'firstName';
+      // gender.text = 'male';
+      // lastName.text = 'lastname';
+      // middleName.text = 'middleNAME';
+      // mobileNumber.text = '12345678';
+      // nationality.text = 'nationality';
+      // natureOfBusiness.text = 'natureOfBusiness';
+      // passportNumber.text = '111111111111';
+      // placeOfBirth.text = 'placeofbirth';
+      // position.text = 'position';
+      // employerAddress.text = 'employerAddress';
+      // provincialAddress.text = 'provincialAddress';
+      // recruitmentAgency.text = 'recruitmentAgency';
+      // religion.text = 'religion';
+      // sssNumber.text = 'sssNumber';
+      // telNumber.text = 'telNumber';
+      // termOfContract.text = 'termOfContract';
+      // tinNumber.text = 'tinNumber';
     });
   }
 
