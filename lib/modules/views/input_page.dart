@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -78,44 +79,47 @@ class _InputPageState extends State<InputPage> {
     if (!res) {
       return;
     }
-    inputBloc.setInfo(Info(
-        id: id,
-        presentAddress: presentAddress.text,
-        agent: agent.text,
-        civilStatus: civilStatus.text,
-        countryOfDeployment: countryOfDeployment.text,
-        dateOfBirth: dateOfBirth.text,
-        dateOfEmployment: employmentDate.text,
-        dependents: _dependents.value.map((e) => e.toJson()).toList(),
-        email: email.text,
-        effectiveDate: effectiveDate.text,
-        employer: employerName.text,
-        employmentContactNumber: employmentContactNumber.text,
-        expiryDate: expiryDate.text,
-        firstName: firstName.text,
-        gender: gender.text,
-        lastName: lastName.text,
-        middleName: middleName.text,
-        mobileNumber: mobileNumber.text,
-        nationality: nationality.text,
-        natureOfBusiness: natureOfBusiness.text,
-        passportNumber: passportNumber.text,
-        placeOfBirth: placeOfBirth.text,
-        position: position.text,
-        address: employerAddress.text,
-        provincialAddress: provincialAddress.text,
-        recruitmentAgency: recruitmentAgency.text,
-        religion: religion.text,
-        sssNumber: sssNumber.text,
-        telNumber: telNumber.text,
-        termOfContract: termOfContract.text,
-        tinNumber: tinNumber.text,
-        isDone: false,
-        isPaid: false,
-        passportImagePath: '',
-        paymentMethod: _selectedPayment$.value.toString(),
-        submissionDate: DateFormat('dd/MM/yyyy').format(DateTime.now()),
-        receiptImagePath: ''));
+    // await inputBloc.setInfo(
+    //     Info(
+    //         id: id,
+    //         presentAddress: presentAddress.text,
+    //         agent: agent.text,
+    //         civilStatus: civilStatus.text,
+    //         countryOfDeployment: countryOfDeployment.text,
+    //         dateOfBirth: dateOfBirth.text,
+    //         dateOfEmployment: employmentDate.text,
+    //         dependents: _dependents.value.map((e) => e.toJson()).toList(),
+    //         email: email.text,
+    //         effectiveDate: effectiveDate.text,
+    //         employer: employerName.text,
+    //         employmentContactNumber: employmentContactNumber.text,
+    //         expiryDate: expiryDate.text,
+    //         firstName: firstName.text,
+    //         gender: gender.text,
+    //         lastName: lastName.text,
+    //         middleName: middleName.text,
+    //         mobileNumber: mobileNumber.text,
+    //         nationality: nationality.text,
+    //         natureOfBusiness: natureOfBusiness.text,
+    //         passportNumber: passportNumber.text,
+    //         placeOfBirth: placeOfBirth.text,
+    //         position: position.text,
+    //         address: employerAddress.text,
+    //         provincialAddress: provincialAddress.text,
+    //         recruitmentAgency: recruitmentAgency.text,
+    //         religion: religion.text,
+    //         sssNumber: sssNumber.text,
+    //         telNumber: telNumber.text,
+    //         termOfContract: termOfContract.text,
+    //         tinNumber: tinNumber.text,
+    //         isDone: false,
+    //         isPaid: false,
+    //         passportImagePath: passportImagePath,
+    //         paymentMethod: _selectedPayment$.value.toString(),
+    //         submissionDate: DateFormat('dd/MM/yyyy').format(DateTime.now()),
+    //         receiptImagePath: receiptImagePath),
+    //     context);
+    Navigator.pushReplacementNamed(context, 'done');
   }
 
   @override
@@ -352,8 +356,12 @@ class _InputPageState extends State<InputPage> {
                               children: [
                                 IconButton(
                                   onPressed: () async {
-                                    await inputBloc.pickImage(
-                                        false, id, 'passport');
+                                    passportImagePath =
+                                        await inputBloc.pickImage(
+                                            false,
+                                            id,
+                                            'passport',
+                                            inputBloc.passportImage$);
                                   },
                                   splashRadius: 30,
                                   iconSize: 40,
@@ -368,8 +376,8 @@ class _InputPageState extends State<InputPage> {
                                 // ),
                                 IconButton(
                                   onPressed: () async {
-                                    await inputBloc.pickImage(
-                                        true, id, 'passport');
+                                    await inputBloc.pickImage(true, id,
+                                        'passport', inputBloc.passportImage$);
                                   },
                                   splashRadius: 30,
                                   iconSize: 40,
@@ -383,12 +391,14 @@ class _InputPageState extends State<InputPage> {
                             ),
                           ),
                           Center(
-                            child: StreamBuilder<File>(
-                                stream: inputBloc.file$,
+                            child: StreamBuilder<Uint8List>(
+                                stream: inputBloc.passportImage$,
                                 builder: (context, snapshot) {
                                   if (snapshot.data == null) {
                                     return const SizedBox();
                                   }
+                                  print('file2');
+                                  print(snapshot.data!.length);
                                   return const Center(
                                       child: Icon(
                                     Icons.check,
@@ -811,6 +821,7 @@ class _InputPageState extends State<InputPage> {
                           _selectedPayment$.add(3);
                         },
                         title: Text('Bank Transfer'),
+
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -854,9 +865,13 @@ class _InputPageState extends State<InputPage> {
                                                 children: [
                                                   IconButton(
                                                     onPressed: () async {
-                                                      // await inputBloc.pickImage(
-                                                      //     false,
-                                                      //     inputBloc.bankFile$);
+                                                      receiptImagePath =
+                                                          await inputBloc.pickImage(
+                                                              false,
+                                                              id,
+                                                              'bank_receipt',
+                                                              inputBloc
+                                                                  .receiptImage$);
                                                     },
                                                     splashRadius: 25,
                                                     iconSize: 30,
@@ -873,9 +888,13 @@ class _InputPageState extends State<InputPage> {
                                                   // ),
                                                   IconButton(
                                                     onPressed: () async {
-                                                      // await inputBloc.pickImage(
-                                                      //     true,
-                                                      //     inputBloc.bankFile$);
+                                                      receiptImagePath =
+                                                          await inputBloc.pickImage(
+                                                              true,
+                                                              id,
+                                                              'bank_receipt',
+                                                              inputBloc
+                                                                  .receiptImage$);
                                                     },
                                                     splashRadius: 25,
                                                     iconSize: 30,
@@ -891,8 +910,9 @@ class _InputPageState extends State<InputPage> {
                                               ),
                                             ),
                                             Center(
-                                              child: StreamBuilder<File>(
-                                                  stream: inputBloc.file$,
+                                              child: StreamBuilder<Uint8List>(
+                                                  stream:
+                                                      inputBloc.receiptImage$,
                                                   builder: (context, snapshot) {
                                                     if (snapshot.data == null) {
                                                       return const SizedBox();
@@ -915,6 +935,7 @@ class _InputPageState extends State<InputPage> {
                                   )),
                           ],
                         ),
+
                         leading: data == 3
                             ? Icon(Icons.circle_rounded, color: Colors.green)
                             : Icon(Icons.circle_outlined),
@@ -1005,7 +1026,7 @@ class _InputPageState extends State<InputPage> {
       keyboardType: keyboardType,
       onChanged: (str) {
         if (onChanged != null) {
-          id = docIdFromCurrentDate() + email.text;
+          id = email.text;
         }
       },
     );
@@ -1061,6 +1082,7 @@ class _InputPageState extends State<InputPage> {
   Widget textFieldChoice(TextEditingController ctrler, String labelText) {
     return TextFieldShared(
         labelText: labelText,
+        readOnly: true,
         ctrler: termOfContract,
         keyboardType: TextInputType.none,
         constraints:

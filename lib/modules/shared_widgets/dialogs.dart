@@ -48,6 +48,7 @@ Future<bool> showConfirmDialog(
             style: TextButton.styleFrom(backgroundColor: Colors.blue),
             child: const Text(
               'Yes',
+              style: TextStyle(color: Colors.white),
             ),
             onPressed: () {
               res = true;

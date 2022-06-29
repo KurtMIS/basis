@@ -1,3 +1,4 @@
+import '../modules/views/done_page.dart';
 import '../modules/views/input_page.dart';
 import '../modules/views/login.dart';
 import '../modules/views/main.dart';
@@ -9,5 +10,6 @@ dynamic routes() {
     'login': (context) => const LoginPage(),
     'input': (context) => const InputPage(),
     'view': (context) => const ViewPage(),
+    'done': (context) => const DonePage(),
   };
 }
