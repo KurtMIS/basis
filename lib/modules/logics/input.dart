@@ -22,9 +22,6 @@ class Input {
     await inputRepo.setInfo(req);
   }
 
-  Future<void> updateInfo(Info req, Map<String, dynamic> map) async =>
-      await inputRepo.updateInfo(req, map);
-
   Future<String> pickImage(bool isCamera, String id, String folderName,
       BehaviorSubject subject) async {
     // subject.add(null);

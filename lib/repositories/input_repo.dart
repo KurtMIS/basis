@@ -15,8 +15,15 @@ class InputRepo {
         data: req.toJson(),
       );
 
-  Future<void> updateInfo(Info req, Map<String, dynamic> map) async =>
-      await documentReference('info', req.id).update(map);
+  Future<bool> updateInfo(Info req, Map<String, dynamic> map) async {
+    var bool = false;
+
+    await documentReference('info', req.id)
+        .update(map)
+        .then((value) => bool = true)
+        .onError((error, stackTrace) => bool = false);
+    return bool;
+  }
 
   Stream<List<Info>> getInfos$() => _service.collectionStream(
         path: InfoApi.infos,
@@ -40,10 +47,10 @@ class InputRepo {
         },
         queryBuilder: (Query<Object?> query) {
           // return query;
-          if (info.mobileNumber.isNotEmpty) {
+          if (info.email.isNotEmpty) {
             query = query.where(
-              'mobileNumber',
-              isEqualTo: info.mobileNumber,
+              'email',
+              isEqualTo: info.email,
             );
           }
           if (info.submissionDate.isNotEmpty) {
@@ -54,11 +61,18 @@ class InputRepo {
           // if (info.processedDate) {
           // query = query.where('submissionDate', isEqualTo: info.submissionDate);
           // }
-
-          query = query.where('isPaid', isEqualTo: info.isPaid);
+          if (info.isPaid) {
+            query = query.where('isPaid', isEqualTo: info.isPaid);
+          }
+          if (info.isDone) {
+            query = query.where('isDone', isEqualTo: info.isDone);
+          }
           // .where('isDone', isEqualTo: info.isDone)
 
           // .where('dateOfBirth', isEqualTo: info.dateOfBirth);
+          if (info.position.isNotEmpty) {
+            query = query.limit(5);
+          }
           return query;
         },
         sort: (Info first, Info second) {
