@@ -5,7 +5,7 @@ selectPopupDate(BuildContext? context, TextEditingController dateCtrler) async {
   final selected = await showDatePicker(
     context: context!,
     initialDate: DateTime.now(),
-    firstDate: DateTime(2000),
+    firstDate: DateTime.now().subtract(const Duration(days: 36500)),
     lastDate: DateTime(2025),
   );
   if (selected != null && selected != DateTime.now()) {

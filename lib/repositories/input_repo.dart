@@ -25,19 +25,19 @@ class InputRepo {
     return bool;
   }
 
-  Stream<List<Info>> getInfos$() => _service.collectionStream(
-        path: InfoApi.infos,
-        builder: (data, documentId) {
-          Info infos = Info.fromJson(data);
-          return infos;
-        },
-        queryBuilder: (Query<Object?> query) {
-          return query.orderBy('id', descending: true);
-        },
-        sort: (Info first, Info second) {
-          return first.id.compareTo(second.id);
-        },
-      );
+  // Stream<List<Info>> getInfos$() => _service.collectionStream(
+  //       path: InfoApi.infos,
+  //       builder: (data, documentId) {
+  //         Info infos = Info.fromJson(data);
+  //         return infos;
+  //       },
+  //       queryBuilder: (Query<Object?> query) {
+  //         return query.orderBy('id', descending: true);
+  //       },
+  //       sort: (Info first, Info second) {
+  //         return first.id.compareTo(second.id);
+  //       },
+  //     );
 
   Stream<List<Info>> searchInfo$(Info info) => _service.collectionStream(
         path: InfoApi.infos,
@@ -46,7 +46,6 @@ class InputRepo {
           return infos;
         },
         queryBuilder: (Query<Object?> query) {
-          // return query;
           if (info.email.isNotEmpty) {
             query = query.where(
               'email',
@@ -57,21 +56,15 @@ class InputRepo {
             query =
                 query.where('submissionDate', isEqualTo: info.submissionDate);
           }
-
-          // if (info.processedDate) {
-          // query = query.where('submissionDate', isEqualTo: info.submissionDate);
-          // }
-          if (info.isPaid) {
-            query = query.where('isPaid', isEqualTo: info.isPaid);
+          if (info.firstName != '0') {
+            query = query.where('isPaid', isEqualTo: info.firstName == '1');
           }
-          if (info.isDone) {
-            query = query.where('isDone', isEqualTo: info.isDone);
+          if (info.lastName != '0') {
+            query = query.where('isDone', isEqualTo: info.lastName == '1');
           }
-          // .where('isDone', isEqualTo: info.isDone)
 
-          // .where('dateOfBirth', isEqualTo: info.dateOfBirth);
           if (info.position.isNotEmpty) {
-            query = query.limit(5);
+            // query = query.limit(5);
           }
           return query;
         },

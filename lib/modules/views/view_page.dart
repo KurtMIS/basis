@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:rxdart/subjects.dart';
+import '../../constants/measure.dart';
 import '../../services/locator.dart';
 import '../../utils/debouncer.dart';
+import '../logics/input.dart';
 import '../logics/view.dart';
 import '../models/info/info.dart';
 import '../shared_widgets/lists.dart';
@@ -16,31 +18,32 @@ class ViewPage extends StatefulWidget {
 
 class _ViewPageState extends State<ViewPage> {
   final view = locator.get<View>();
-
+  final input = locator.get<Input>();
   final emailCtrler = TextEditingController();
   final dateCtrler = TextEditingController();
-  final isPaid$ = BehaviorSubject<bool>.seeded(false);
-  final isDone$ = BehaviorSubject<bool>.seeded(false);
-  final debouncer = Debouncer(delay: const Duration(milliseconds: 200));
+  final paidDropDown$ = BehaviorSubject<int>.seeded(0);
+  final doneDropDown$ = BehaviorSubject<int>.seeded(0);
+  final debouncer = Debouncer(delay: const Duration(milliseconds: 100));
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      refresh();
-    });
-  }
-
-  void refresh() {
+  void refresh({bool? cancel}) {
+    if (cancel == null) view.cancelSubscription();
     debouncer.run(() => view.getInfos(Info(
-        isPaid: isPaid$.value,
-        isDone: isDone$.value,
+        firstName: '${paidDropDown$.value}',
+        lastName: '${doneDropDown$.value}',
         email: emailCtrler.text,
         submissionDate: dateCtrler.text,
         position:
             (dateCtrler.text.trim().isEmpty || emailCtrler.text.isNotEmpty)
                 ? 'searching'
                 : '')));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      refresh(cancel: true);
+    });
   }
 
   selectPopupDate(
@@ -68,8 +71,6 @@ class _ViewPageState extends State<ViewPage> {
           color: Colors.blue.shade100,
           padding: const EdgeInsets.all(15.0),
           child: Wrap(
-            // crossAxisAlignment: WrapCrossAlignment.start,
-            // alignment: WrapAlignment.start,
             spacing: 25.0,
             runSpacing: 20.0,
             children: [
@@ -85,13 +86,13 @@ class _ViewPageState extends State<ViewPage> {
                       icon: const Icon(Icons.clear),
                       onPressed: () {
                         dateCtrler.clear();
+                        refresh();
                       },
                     ),
                     border: const OutlineInputBorder(),
                     labelText: 'Submission Date',
                     constraints: const BoxConstraints(maxWidth: 200)),
               ),
-              // const SizedBox(width: 20),
               TextFormField(
                 controller: emailCtrler,
                 onChanged: (_) {
@@ -104,52 +105,20 @@ class _ViewPageState extends State<ViewPage> {
                       icon: const Icon(Icons.clear),
                       onPressed: () {
                         emailCtrler.clear();
+                        refresh();
                       },
                     ),
                     border: const OutlineInputBorder(),
                     labelText: 'email',
                     constraints: const BoxConstraints(maxWidth: 200)),
               ),
-              // const SizedBox(width: 20),
-              StreamBuilder<bool>(
-                  stream: isPaid$,
-                  builder: (context, snapshot) {
-                    if (snapshot.data == null) {
-                      return const SizedBox();
-                    }
-                    return FloatingActionButton.extended(
-                      elevation: 0.0,
-                      backgroundColor:
-                          snapshot.data! ? Colors.blue : Colors.grey,
-                      onPressed: () {
-                        isPaid$.add(!snapshot.data!);
-                        refresh();
-                      },
-                      label: const Text('Paid'),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                    );
-                  }),
-              // const SizedBox(width: 20),
-              StreamBuilder<bool>(
-                  stream: isDone$,
-                  builder: (context, snapshot) {
-                    if (snapshot.data == null) {
-                      return const SizedBox();
-                    }
-                    return FloatingActionButton.extended(
-                      elevation: 0.0,
-                      backgroundColor:
-                          snapshot.data! ? Colors.blue : Colors.grey,
-                      onPressed: () {
-                        isDone$.add(!snapshot.data!);
-                        refresh();
-                      },
-                      label: const Text('Done'),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                    );
-                  }),
+              dropDown(['All', 'Paid', 'Not Paid'], paidDropDown$, () {
+                refresh();
+              }),
+              // const SizedBox(width: 5),
+              dropDown(['All', 'Emailed', 'Not Emailed'], doneDropDown$, () {
+                refresh();
+              })
             ],
           ),
         ),
@@ -160,61 +129,199 @@ class _ViewPageState extends State<ViewPage> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 }
-                return ListItemsBuilder<Info>(
-                    divided: true,
-                    snapshot: snapshot,
-                    itemBuilder: (context, data) {
-                      return ListTile(
-                        // onTap: () async => await view
-                        // .setInfo(data.copyWith(isPaid: true, isDone: true)),
-                        title: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(data.firstName),
-                            Row(children: [
-                              TextButton(
-                                style: TextButton.styleFrom(
-                                    backgroundColor: data.isPaid
-                                        ? Colors.green
-                                        : Colors.white),
-                                onPressed: () {
-                                  view.updateInfo(
-                                      data, {'isPaid': !data.isPaid}, context);
-                                },
-                                child: Text(
-                                    data.isPaid ? 'Paid' : 'Mark as paid',
-                                    style: TextStyle(
-                                        color: data.isPaid
-                                            ? Colors.white
-                                            : Colors.blue)),
+                final summary = view.summary;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Row(
+                                children: [
+                                  const Text('Paid:',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.blue)),
+                                  const SizedBox(width: 10),
+                                  Text('${summary['paid']}'),
+                                ],
                               ),
-                              if (data.isPaid || data.isPaid)
-                                const SizedBox(width: 15),
-                              TextButton(
-                                style: TextButton.styleFrom(
-                                    backgroundColor: data.isDone
-                                        ? Colors.green
-                                        : Colors.white),
-                                onPressed: () {
-                                  view.updateInfo(
-                                      data, {'isDone': !data.isDone}, context);
-                                },
-                                child: Text(
-                                    data.isDone ? 'Done' : 'Mark as done',
-                                    style: TextStyle(
-                                        color: data.isDone
-                                            ? Colors.white
-                                            : Colors.blue)),
-                              )
-                            ]),
-                          ],
-                        ),
-                        subtitle: Text(data.dateOfBirth),
-                      );
-                    });
+                              const SizedBox(width: 10),
+                              Row(
+                                children: [
+                                  const Text('Emailed:',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.green)),
+                                  const SizedBox(width: 10),
+                                  Text('${summary['done']}'),
+                                ],
+                              ),
+                              const SizedBox(width: 20),
+                              Row(
+                                children: [
+                                  const Text('Total:',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold)),
+                                  const SizedBox(width: 10),
+                                  Text('${summary['total']}'),
+                                ],
+                              ),
+                            ],
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              input.info = Info();
+                              Navigator.pushNamed(context, 'input');
+                            },
+                            child: Row(
+                              children: [
+                                const Icon(Icons.add),
+                                const SizedBox(width: 10),
+                                isWeb(context)
+                                    ? const Text('Add New')
+                                    : const Text('New')
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: ListItemsBuilder<Info>(
+                          divided: true,
+                          snapshot: snapshot,
+                          itemBuilder: (context, data) {
+                            return Column(
+                              children: [
+                                ListTile(
+                                  onTap: () {
+                                    input.info = data;
+                                    Navigator.pushNamed(context, 'input');
+                                  },
+                                  title: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                          '${data.lastName}, ${data.firstName}  ${(isWeb(context) ? data.lastName : '')}'),
+                                      Row(children: [
+                                        TextButton(
+                                          style: TextButton.styleFrom(
+                                              backgroundColor: data.isPaid
+                                                  ? Colors.blue
+                                                  : Colors.white),
+                                          onPressed: () {
+                                            view.updateInfo(
+                                                data,
+                                                {'isPaid': !data.isPaid},
+                                                context);
+                                          },
+                                          child: Text(
+                                              data.isPaid ? 'Paid' : 'Not paid',
+                                              style: TextStyle(
+                                                  color: data.isPaid
+                                                      ? Colors.white
+                                                      : Colors.blue)),
+                                        ),
+                                        if (data.isPaid || data.isPaid)
+                                          const SizedBox(width: 15),
+                                        TextButton(
+                                          style: TextButton.styleFrom(
+                                              backgroundColor: data.isDone
+                                                  ? Colors.green
+                                                  : Colors.white),
+                                          onPressed: () {
+                                            view.updateInfo(
+                                                data,
+                                                {'isDone': !data.isDone},
+                                                context);
+                                          },
+                                          child: Text(
+                                              data.isDone
+                                                  ? 'Emailed'
+                                                  : 'Not emailed',
+                                              style: TextStyle(
+                                                  color: data.isDone
+                                                      ? Colors.white
+                                                      : Colors.green)),
+                                        )
+                                      ]),
+                                    ],
+                                  ),
+                                  subtitle: Text(
+                                      'Email:${data.email}   ${(isWeb(context) ? 'Birthday: ${data.dateOfBirth}' : '')}'),
+                                ),
+                                const Divider(
+                                  height: 3,
+                                  thickness: 2,
+                                )
+                              ],
+                            );
+                          }),
+                    ),
+                  ],
+                );
               }),
         ),
       ],
+    );
+  }
+
+  Widget dropDown(
+      List<String> servers, BehaviorSubject<int> idx, dynamic func) {
+    return Container(
+      alignment: Alignment.centerLeft,
+      constraints: const BoxConstraints(maxWidth: 150),
+      child: StreamBuilder<int>(
+          stream: idx,
+          builder: (context, snapshot) {
+            if (snapshot.data == null) {
+              return const SizedBox();
+            }
+            final data = snapshot.data;
+            return PopupMenuButton(
+              constraints: const BoxConstraints(maxWidth: 150),
+              // initialValue: 2,
+              onSelected: (_) async {
+                // await schedProv.removeLocalCredential();
+                // Navigator.pushReplacementNamed(context, 'login');
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Text(servers.elementAt(data!), style: const TextStyle()),
+                    ],
+                  ),
+                  const Icon(
+                    Icons.arrow_drop_down,
+                    color: Colors.grey,
+                  ),
+                ],
+              ),
+              itemBuilder: (context) {
+                return List.generate(3, (index) {
+                  return PopupMenuItem(
+                    onTap: () {
+                      idx.add(index);
+                      func();
+                    },
+                    value: index,
+                    child: Text(
+                      servers.elementAt(index),
+                    ),
+                  );
+                });
+              },
+            );
+          }),
     );
   }
 }

@@ -1,14 +1,16 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:stronghold_ofw/modules/shared_widgets/textfield.dart';
 import '../../constants/measure.dart';
 import '../../services/locator.dart';
-import '../../utils/date_convert.dart';
+import '../../utils/future_image.dart';
 import '../logics/input.dart';
 import '../models/dependent/dependent.dart';
 import '../models/info/info.dart';
@@ -26,9 +28,11 @@ class _InputPageState extends State<InputPage> {
   final inputBloc = locator.get<Input>();
 
   final CarouselController carouselCtrler = CarouselController();
-  final _formKey = GlobalKey<FormState>();
+  // final _formKey = GlobalKey<FormState>();
   final _current$ = BehaviorSubject<int>.seeded(0);
   final _selectedPayment$ = BehaviorSubject<int>.seeded(0);
+
+  final ScrollController scrollCtrler = ScrollController();
 
   final firstName = TextEditingController();
   final lastName = TextEditingController();
@@ -93,7 +97,7 @@ class _InputPageState extends State<InputPage> {
             effectiveDate: effectiveDate.text,
             employer: employerName.text,
             employmentContactNumber: employmentContactNumber.text,
-            expiryDate: expiryDate.text,
+            // expiryDate: expiryDate.text,
             firstName: firstName.text,
             gender: gender.text,
             lastName: lastName.text,
@@ -119,54 +123,82 @@ class _InputPageState extends State<InputPage> {
             submissionDate: DateFormat('dd/MM/yyyy').format(DateTime.now()),
             receiptImagePath: receiptImagePath),
         context);
-    Navigator.pushReplacementNamed(context, 'done');
+    //done
+    Navigator.pushReplacementNamed(context, 'view');
   }
 
   @override
   void initState() {
-    super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      // presentAddress.text = 'presentAddress';
-      // agent.text = 'agent';
-      // civilStatus.text = 'civilStatus';
-      // countryOfDeployment.text = 'countryOfDeployment';
-      // dateOfBirth.text = '10/10/1988';
-      // employmentDate.text = '22/06/2021';
-      // email.text = 'email';
-      // effectiveDate.text = '22/06/2022';
-      // employerName.text = 'employerName';
-      // employmentContactNumber.text = 'employmentContactNumber';
-      // expiryDate.text = '10/05/2025';
-      // firstName.text = 'firstName';
-      // gender.text = 'male';
-      // lastName.text = 'lastname';
-      // middleName.text = 'middleNAME';
-      // mobileNumber.text = '12345678';
-      // nationality.text = 'nationality';
-      // natureOfBusiness.text = 'natureOfBusiness';
-      // passportNumber.text = '111111111111';
-      // placeOfBirth.text = 'placeofbirth';
-      // position.text = 'position';
-      // employerAddress.text = 'employerAddress';
-      // provincialAddress.text = 'provincialAddress';
-      // recruitmentAgency.text = 'recruitmentAgency';
-      // religion.text = 'religion';
-      // sssNumber.text = 'sssNumber';
-      // telNumber.text = 'telNumber';
-      // termOfContract.text = 'termOfContract';
-      // tinNumber.text = 'tinNumber';
+      final info = inputBloc.info;
+      if (info.id != '') {
+        id = info.id;
+        presentAddress.text = info.presentAddress;
+        agent.text = info.agent;
+        civilStatus.text = info.civilStatus;
+        countryOfDeployment.text = info.countryOfDeployment;
+        dateOfBirth.text = info.dateOfBirth;
+        employmentDate.text = info.dateOfEmployment;
+        email.text = info.email;
+        effectiveDate.text = info.effectiveDate;
+        employerName.text = info.employer;
+        employmentContactNumber.text = info.employmentContactNumber;
+        // expiryDate.text = info.expiryDate;
+        firstName.text = info.firstName;
+        gender.text = info.gender;
+        lastName.text = info.lastName;
+        middleName.text = info.middleName;
+        mobileNumber.text = info.mobileNumber;
+        nationality.text = info.nationality;
+        natureOfBusiness.text = info.natureOfBusiness;
+        // passportNumber.text = info.pass;
+        placeOfBirth.text = info.placeOfBirth;
+        position.text = info.position;
+        employerAddress.text = info.address;
+        provincialAddress.text = info.provincialAddress;
+        recruitmentAgency.text = info.recruitmentAgency;
+        religion.text = info.religion;
+        sssNumber.text = info.sssNumber;
+        telNumber.text = info.telNumber;
+        termOfContract.text = info.termOfContract;
+        tinNumber.text = info.tinNumber;
+        inputBloc.passportImage$.add(info.passportImagePath);
+        inputBloc.receiptImage$.add(info.receiptImagePath);
+
+        Future.delayed(const Duration(milliseconds: 200), () {
+          _current$.add(3);
+          carouselCtrler.jumpToPage(3);
+          _selectedPayment$.add(int.parse(info.paymentMethod));
+        });
+      } else {
+        inputBloc.passportImage$.add('');
+        inputBloc.receiptImage$.add('');
+      }
     });
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: isWeb(context)
-          ? AppBar(
-              title: const Text('Stronghold for OFW'),
-            )
-          : null,
+      appBar:
+          // appBar: isWeb(context)
+          // ?
+          AppBar(
+        title: const Text('Stronghold for OFW'),
+      ),
+      // : null,
+      floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            scrollCtrler.animateTo(
+              scrollCtrler.position.maxScrollExtent,
+              duration: const Duration(seconds: 1),
+              curve: Curves.fastOutSlowIn,
+            );
+          },
+          child: const Icon(Icons.arrow_downward)),
       body: SingleChildScrollView(
+        physics: const NeverScrollableScrollPhysics(),
         child: Stack(
           children: [
             SingleChildScrollView(
@@ -261,6 +293,7 @@ class _InputPageState extends State<InputPage> {
 
   List<Widget> imageSliders(BuildContext context) => imgList(context)
       .map((item) => SingleChildScrollView(
+            controller: scrollCtrler,
             child: Padding(
               padding: const EdgeInsets.only(
                   left: 20, right: 20, top: 20, bottom: 50),
@@ -323,7 +356,6 @@ class _InputPageState extends State<InputPage> {
                 keyboardType: TextInputType.phone),
             Container(
                 alignment: Alignment.center,
-                // constraints: const BoxConstraints(maxWidth: 300),
                 padding: const EdgeInsets.only(
                   bottom: 20,
                 ),
@@ -336,26 +368,19 @@ class _InputPageState extends State<InputPage> {
                           const Text('Passport',
                               style: TextStyle(fontWeight: FontWeight.bold)),
                           const SizedBox(height: 5),
-                          // textField(passportNumber, '*Passport Number',
-                          //     keyboardType: TextInputType.number),
-                          // const SizedBox(height: 10),
-                          // textFieldDate(
-                          //   expiryDate,
-                          //   '*Expiry Date',
-                          // ),
                           const SizedBox(height: 15),
                           const Text('Attach image:'),
-                          // const SizedBox(
-                          //   height: 10,
-                          // ),
                           Align(
-                            // alignment: Alignment.center,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 IconButton(
                                   onPressed: () async {
+                                    if (email.text.isEmpty) {
+                                      showToast('Email is required');
+                                      return;
+                                    }
                                     passportImagePath =
                                         await inputBloc.pickImage(
                                             false,
@@ -368,14 +393,14 @@ class _InputPageState extends State<InputPage> {
                                   padding: const EdgeInsets.all(30),
                                   icon: const Icon(
                                     Icons.image_outlined,
-                                    // textDirection: TextDirection.rtl,
                                   ),
                                 ),
-                                // SizedBox(
-                                //   width: 40,
-                                // ),
                                 IconButton(
                                   onPressed: () async {
+                                    if (email.text.isEmpty) {
+                                      showToast('Email is required');
+                                      return;
+                                    }
                                     await inputBloc.pickImage(true, id,
                                         'passport', inputBloc.passportImage$);
                                   },
@@ -384,26 +409,39 @@ class _InputPageState extends State<InputPage> {
                                   padding: const EdgeInsets.all(30),
                                   icon: const Icon(
                                     Icons.camera_alt_outlined,
-                                    // textDirection: TextDirection.RTL,
                                   ),
                                 ),
                               ],
                             ),
                           ),
                           Center(
-                            child: StreamBuilder<Uint8List>(
+                            child: StreamBuilder<String>(
                                 stream: inputBloc.passportImage$,
                                 builder: (context, snapshot) {
                                   if (snapshot.data == null) {
                                     return const SizedBox();
                                   }
-                                  print('file2');
-                                  print(snapshot.data!.length);
-                                  return const Center(
-                                      child: Icon(
-                                    Icons.check,
-                                    color: Colors.green,
-                                  ));
+                                  if (snapshot.data == '') {
+                                    return const Center(
+                                        child: Text('No image'));
+                                  }
+                                  final complete = Completer();
+                                  complete.complete(snapshot.data);
+                                  return GestureDetector(
+                                    onTap: () async {
+                                      await showDialog(
+                                          context: context,
+                                          builder: (_) => imageDialog(
+                                              tag: snapshot.data!,
+                                              context: context));
+                                    },
+                                    child: ImageWithState(
+                                        height: 50,
+                                        width: 50,
+                                        futureUrl: complete.future.then((t) {
+                                          return t.toString();
+                                        })),
+                                  );
                                 }),
                           ),
                           const Text(
@@ -522,7 +560,8 @@ class _InputPageState extends State<InputPage> {
                                     textField(sharingDependent, 'Sharing ( % )',
                                         keyboardType: TextInputType.number),
                                     const SizedBox(height: 20),
-                                    textField(revocableDependent, 'Revocable?'),
+                                    textField(revocableDependent, 'Revocable?',
+                                        hintText: 'Yes or No only'),
                                     const SizedBox(height: 20),
                                   ],
                                 ),
@@ -789,10 +828,11 @@ class _InputPageState extends State<InputPage> {
                           }
                           _selectedPayment$.add(1);
                         },
-                        title: Text('Pay to agent'),
+                        title: const Text('Pay to agent'),
                         leading: data == 1
-                            ? Icon(Icons.circle_rounded, color: Colors.green)
-                            : Icon(Icons.circle_outlined),
+                            ? const Icon(Icons.circle_rounded,
+                                color: Colors.green)
+                            : const Icon(Icons.circle_outlined),
                         // subtitle: Text('09207433898'),
                       ),
                       const Divider(),
@@ -804,11 +844,12 @@ class _InputPageState extends State<InputPage> {
                           }
                           _selectedPayment$.add(2);
                         },
-                        title: Text('GCASH'),
-                        subtitle: Text('09207433898'),
+                        title: const Text('GCASH'),
+                        subtitle: const Text('09207433898'),
                         leading: data == 2
-                            ? Icon(Icons.circle_rounded, color: Colors.green)
-                            : Icon(Icons.circle_outlined),
+                            ? const Icon(Icons.circle_rounded,
+                                color: Colors.green)
+                            : const Icon(Icons.circle_outlined),
                       ),
                       const Divider(),
                       ListTile(
@@ -820,17 +861,16 @@ class _InputPageState extends State<InputPage> {
                           }
                           _selectedPayment$.add(3);
                         },
-                        title: Text('Bank Transfer'),
+                        title: const Text('Bank Transfer'),
 
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Account:   Jet Estacion'),
-                            Text('Account #: 8885-5555-5555'),
+                            const Text('Account:   Jet Estacion'),
+                            const Text('Account #: 8885-5555-5555'),
                             if (data == 3)
                               Container(
                                   alignment: Alignment.center,
-                                  // constraints: const BoxConstraints(maxWidth: 300),
                                   padding: const EdgeInsets.only(
                                     bottom: 20,
                                   ),
@@ -843,20 +883,9 @@ class _InputPageState extends State<InputPage> {
                                           children: [
                                             const Text('Transaction Receipt'),
                                             const SizedBox(height: 15),
-                                            // textField(passportNumber, '*Passport Number',
-                                            //     keyboardType: TextInputType.number),
-                                            // const SizedBox(height: 10),
-                                            // textFieldDate(
-                                            //   expiryDate,
-                                            //   '*Expiry Date',
-                                            // ),
                                             const SizedBox(height: 15),
                                             const Text('Attach image:'),
-                                            // const SizedBox(
-                                            //   height: 10,
-                                            // ),
                                             Align(
-                                              // alignment: Alignment.center,
                                               child: Row(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.center,
@@ -880,12 +909,8 @@ class _InputPageState extends State<InputPage> {
                                                             15),
                                                     icon: const Icon(
                                                       Icons.image_outlined,
-                                                      // textDirection: TextDirection.rtl,
                                                     ),
                                                   ),
-                                                  // SizedBox(
-                                                  //   width: 40,
-                                                  // ),
                                                   IconButton(
                                                     onPressed: () async {
                                                       receiptImagePath =
@@ -903,25 +928,47 @@ class _InputPageState extends State<InputPage> {
                                                             15),
                                                     icon: const Icon(
                                                       Icons.camera_alt_outlined,
-                                                      // textDirection: TextDirection.RTL,
                                                     ),
                                                   ),
                                                 ],
                                               ),
                                             ),
                                             Center(
-                                              child: StreamBuilder<Uint8List>(
+                                              child: StreamBuilder<String>(
                                                   stream:
                                                       inputBloc.receiptImage$,
                                                   builder: (context, snapshot) {
                                                     if (snapshot.data == null) {
                                                       return const SizedBox();
                                                     }
-                                                    return const Center(
-                                                        child: Icon(
-                                                      Icons.check,
-                                                      color: Colors.green,
-                                                    ));
+                                                    if (snapshot.data == '') {
+                                                      return const Center(
+                                                          child:
+                                                              Text('No image'));
+                                                    }
+                                                    final complete =
+                                                        Completer();
+                                                    complete.complete(
+                                                        snapshot.data);
+                                                    return GestureDetector(
+                                                      onTap: () async {
+                                                        await showDialog(
+                                                            context: context,
+                                                            builder: (_) =>
+                                                                imageDialog(
+                                                                    tag: snapshot
+                                                                        .data!,
+                                                                    context:
+                                                                        context));
+                                                      },
+                                                      child: ImageWithState(
+                                                          height: 30,
+                                                          width: 30,
+                                                          futureUrl: complete
+                                                              .future
+                                                              .then((t) => t
+                                                                  .toString())),
+                                                    );
                                                   }),
                                             ),
                                             const Text(
@@ -937,8 +984,9 @@ class _InputPageState extends State<InputPage> {
                         ),
 
                         leading: data == 3
-                            ? Icon(Icons.circle_rounded, color: Colors.green)
-                            : Icon(Icons.circle_outlined),
+                            ? const Icon(Icons.circle_rounded,
+                                color: Colors.green)
+                            : const Icon(Icons.circle_outlined),
                       ),
                       const Divider(),
                       const SizedBox(height: 30),
@@ -984,7 +1032,7 @@ class _InputPageState extends State<InputPage> {
       controller: ctrler,
       readOnly: true,
       keyboardType: TextInputType.none,
-      enabled: false,
+      enabled: true,
       decoration: InputDecoration(
         labelText: labelText,
         border: InputBorder.none,
@@ -997,7 +1045,6 @@ class _InputPageState extends State<InputPage> {
     return TextFormField(
       controller: ctrler,
       readOnly: true,
-      enabled: false,
       autovalidateMode: AutovalidateMode.always,
       keyboardType: TextInputType.none,
       validator: (str) => str,
@@ -1053,7 +1100,6 @@ class _InputPageState extends State<InputPage> {
       constraints: const BoxConstraints(maxWidth: 300),
       keyboardType: TextInputType.none,
       onTap: () {
-        print('onTap');
         selectPopupDate(context, ctrler);
       },
     );
@@ -1100,5 +1146,38 @@ class _InputPageState extends State<InputPage> {
           }
           termOfContract.text = result;
         });
+  }
+
+  Widget imageDialog(
+      {required String tag,
+      // required Widget widget,
+      required BuildContext context}) {
+    return Dialog(
+      child: Stack(children: [
+        PhotoView(
+          tightMode: true,
+          imageProvider: NetworkImage(tag),
+        ),
+        Positioned(
+          right: 0,
+          top: 0,
+          // width: 100,
+          // height: 100,
+          child: IconButton(
+            // focusColor: Colors.black,
+            hoverColor: Colors.black,
+            color: Colors.black,
+            icon: const Icon(
+              Icons.close,
+              color: Colors.red,
+              size: 30,
+            ),
+            onPressed: () {
+              Navigator.of(context, rootNavigator: true).pop();
+            },
+          ),
+        ),
+      ]),
+    );
   }
 }

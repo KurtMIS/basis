@@ -13,6 +13,6 @@ void locatorSetup() {
   locator.registerSingleton<Main>(Main());
   locator.registerLazySingleton<View>(() => View());
 
-  locator.registerLazySingleton<InputRepo>(() => InputRepo());
   locator.registerLazySingleton<Input>(() => Input());
+  locator.registerLazySingleton<InputRepo>(() => InputRepo());
 }

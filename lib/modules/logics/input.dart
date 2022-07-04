@@ -14,9 +14,10 @@ import 'package:firebase_core/firebase_core.dart' as firebase_core;
 
 class Input {
   final inputRepo = locator.get<InputRepo>();
-  final passportImage$ = BehaviorSubject<Uint8List>();
-  final receiptImage$ = BehaviorSubject<Uint8List>();
+  final passportImage$ = BehaviorSubject<String>.seeded('');
+  final receiptImage$ = BehaviorSubject<String>.seeded('');
   final picker = ImagePicker();
+  var info = Info();
 
   Future<void> setInfo(Info req, BuildContext context) async {
     await inputRepo.setInfo(req);
@@ -36,10 +37,15 @@ class Input {
           path: pickedFile.path,
           imageName: id);
 
-      await imageSent.then((x) async {
-        imgPath = await downloadImage(id);
-      }).whenComplete(() => imgPath);
-      subject.add(await pickedFile.readAsBytes());
+      await imageSent
+          .then((x) async {
+            imgPath = await downloadImage(id);
+          })
+          .whenComplete(() => subject.add(imgPath))
+          .onError((error, stackTrace) {
+            subject.add(imgPath);
+            return null;
+          });
     }
     return imgPath;
   }
@@ -74,5 +80,9 @@ class Input {
         .ref('passport/$imagePath.jpg')
         .getDownloadURL();
     return link;
+  }
+
+  populateInput(Info info2) {
+    info = info2;
   }
 }
