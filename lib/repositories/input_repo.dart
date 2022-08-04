@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:stronghold_ofw/services/api.dart';
+import 'package:stronghold_ofw/services1/api.dart';
 
-import '../services/firestore.dart';
+import '../services1/firestore.dart';
 import '../modules/models/info/info.dart';
 
 class InputRepo {

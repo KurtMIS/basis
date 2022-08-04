@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:rxdart/subjects.dart';
 import '../../constants/measure.dart';
-import '../../services/locator.dart';
+import '../../services1/locator.dart';
 import '../../utils/debouncer.dart';
 import '../logics/input.dart';
 import '../logics/view.dart';
@@ -23,7 +23,7 @@ class _ViewPageState extends State<ViewPage> {
   final dateCtrler = TextEditingController();
   final paidDropDown$ = BehaviorSubject<int>.seeded(0);
   final doneDropDown$ = BehaviorSubject<int>.seeded(0);
-  final debouncer = Debouncer(delay: const Duration(milliseconds: 100));
+  final debouncer = Debouncer(delay: const Duration(milliseconds: 1000));
 
   void refresh({bool? cancel}) {
     if (cancel == null) view.cancelSubscription();
@@ -43,6 +43,7 @@ class _ViewPageState extends State<ViewPage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       refresh(cancel: true);
+      locator.get<Input>().isAdmin = true;
     });
   }
 
@@ -96,9 +97,12 @@ class _ViewPageState extends State<ViewPage> {
               TextFormField(
                 controller: emailCtrler,
                 onChanged: (_) {
-                  if (_.trim().length > 2) {
+                  // if (_.trim().length > 2) {
+                  debouncer.run(() async {
                     refresh();
-                  }
+                  });
+
+                  // }
                 },
                 decoration: InputDecoration(
                     suffixIcon: IconButton(
@@ -254,7 +258,7 @@ class _ViewPageState extends State<ViewPage> {
                                     ],
                                   ),
                                   subtitle: Text(
-                                      'Email:${data.email}   ${(isWeb(context) ? 'Birthday: ${data.dateOfBirth}' : '')}'),
+                                      'Email: ${data.email}   ${(isWeb(context) ? 'Birthday: ${data.dateOfBirth}' : '')}'),
                                 ),
                                 const Divider(
                                   height: 3,

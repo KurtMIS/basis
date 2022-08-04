@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import '../../repositories/input_repo.dart';
-import '../../services/locator.dart';
+import '../../services1/locator.dart';
 import '../models/info/info.dart';
 
 class View {

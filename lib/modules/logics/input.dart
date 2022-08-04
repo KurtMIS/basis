@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:rxdart/subjects.dart';
 
 import '../../repositories/input_repo.dart';
-import '../../services/locator.dart';
+import '../../services1/locator.dart';
 import '../models/info/info.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
@@ -17,6 +17,7 @@ class Input {
   final passportImage$ = BehaviorSubject<String>.seeded('');
   final receiptImage$ = BehaviorSubject<String>.seeded('');
   final picker = ImagePicker();
+  var isAdmin = false;
   var info = Info();
 
   Future<void> setInfo(Info req, BuildContext context) async {
@@ -25,12 +26,12 @@ class Input {
 
   Future<String> pickImage(bool isCamera, String id, String folderName,
       BehaviorSubject subject) async {
-    // subject.add(null);
     final pickedFile = await picker.pickImage(
         imageQuality: 50,
         source: isCamera ? ImageSource.camera : ImageSource.gallery);
     var imgPath = '';
     if (pickedFile != null) {
+      subject.add('z');
       final imageSent = await uploadImage(
           folderName: folderName,
           file: await pickedFile.readAsBytes(),

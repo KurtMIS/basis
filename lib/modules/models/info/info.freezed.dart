@@ -56,6 +56,7 @@ mixin _$Info {
   bool get isPaid => throw _privateConstructorUsedError;
   bool get isDone => throw _privateConstructorUsedError;
   String get paymentMethod => throw _privateConstructorUsedError;
+  String get annualPremium => throw _privateConstructorUsedError;
   String get passportImagePath => throw _privateConstructorUsedError;
   String get receiptImagePath => throw _privateConstructorUsedError;
   String get submissionDate => throw _privateConstructorUsedError;
@@ -106,6 +107,7 @@ abstract class $InfoCopyWith<$Res> {
       bool isPaid,
       bool isDone,
       String paymentMethod,
+      String annualPremium,
       String passportImagePath,
       String receiptImagePath,
       String submissionDate,
@@ -157,6 +159,7 @@ class _$InfoCopyWithImpl<$Res> implements $InfoCopyWith<$Res> {
     Object? isPaid = freezed,
     Object? isDone = freezed,
     Object? paymentMethod = freezed,
+    Object? annualPremium = freezed,
     Object? passportImagePath = freezed,
     Object? receiptImagePath = freezed,
     Object? submissionDate = freezed,
@@ -303,6 +306,10 @@ class _$InfoCopyWithImpl<$Res> implements $InfoCopyWith<$Res> {
           ? _value.paymentMethod
           : paymentMethod // ignore: cast_nullable_to_non_nullable
               as String,
+      annualPremium: annualPremium == freezed
+          ? _value.annualPremium
+          : annualPremium // ignore: cast_nullable_to_non_nullable
+              as String,
       passportImagePath: passportImagePath == freezed
           ? _value.passportImagePath
           : passportImagePath // ignore: cast_nullable_to_non_nullable
@@ -364,6 +371,7 @@ abstract class _$$_InfoCopyWith<$Res> implements $InfoCopyWith<$Res> {
       bool isPaid,
       bool isDone,
       String paymentMethod,
+      String annualPremium,
       String passportImagePath,
       String receiptImagePath,
       String submissionDate,
@@ -416,6 +424,7 @@ class __$$_InfoCopyWithImpl<$Res> extends _$InfoCopyWithImpl<$Res>
     Object? isPaid = freezed,
     Object? isDone = freezed,
     Object? paymentMethod = freezed,
+    Object? annualPremium = freezed,
     Object? passportImagePath = freezed,
     Object? receiptImagePath = freezed,
     Object? submissionDate = freezed,
@@ -562,6 +571,10 @@ class __$$_InfoCopyWithImpl<$Res> extends _$InfoCopyWithImpl<$Res>
           ? _value.paymentMethod
           : paymentMethod // ignore: cast_nullable_to_non_nullable
               as String,
+      annualPremium: annualPremium == freezed
+          ? _value.annualPremium
+          : annualPremium // ignore: cast_nullable_to_non_nullable
+              as String,
       passportImagePath: passportImagePath == freezed
           ? _value.passportImagePath
           : passportImagePath // ignore: cast_nullable_to_non_nullable
@@ -621,6 +634,7 @@ class _$_Info with DiagnosticableTreeMixin implements _Info {
       this.isPaid = false,
       this.isDone = false,
       this.paymentMethod = '',
+      this.annualPremium = '',
       this.passportImagePath = '',
       this.receiptImagePath = '',
       this.submissionDate = '',
@@ -741,6 +755,9 @@ class _$_Info with DiagnosticableTreeMixin implements _Info {
   final String paymentMethod;
   @override
   @JsonKey()
+  final String annualPremium;
+  @override
+  @JsonKey()
   final String passportImagePath;
   @override
   @JsonKey()
@@ -754,7 +771,7 @@ class _$_Info with DiagnosticableTreeMixin implements _Info {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Info(id: $id, lastName: $lastName, firstName: $firstName, middleName: $middleName, presentAddress: $presentAddress, provincialAddress: $provincialAddress, dateOfBirth: $dateOfBirth, placeOfBirth: $placeOfBirth, nationality: $nationality, gender: $gender, religion: $religion, civilStatus: $civilStatus, email: $email, mobileNumber: $mobileNumber, telNumber: $telNumber, passportNumber: $passportNumber, expiryDate: $expiryDate, sssNumber: $sssNumber, tinNumber: $tinNumber, dependents: $dependents, agent: $agent, employer: $employer, address: $address, termOfContract: $termOfContract, position: $position, effectiveDate: $effectiveDate, recruitmentAgency: $recruitmentAgency, employmentContactNumber: $employmentContactNumber, natureOfBusiness: $natureOfBusiness, countryOfDeployment: $countryOfDeployment, dateOfEmployment: $dateOfEmployment, occupation: $occupation, isPaid: $isPaid, isDone: $isDone, paymentMethod: $paymentMethod, passportImagePath: $passportImagePath, receiptImagePath: $receiptImagePath, submissionDate: $submissionDate, processedDate: $processedDate)';
+    return 'Info(id: $id, lastName: $lastName, firstName: $firstName, middleName: $middleName, presentAddress: $presentAddress, provincialAddress: $provincialAddress, dateOfBirth: $dateOfBirth, placeOfBirth: $placeOfBirth, nationality: $nationality, gender: $gender, religion: $religion, civilStatus: $civilStatus, email: $email, mobileNumber: $mobileNumber, telNumber: $telNumber, passportNumber: $passportNumber, expiryDate: $expiryDate, sssNumber: $sssNumber, tinNumber: $tinNumber, dependents: $dependents, agent: $agent, employer: $employer, address: $address, termOfContract: $termOfContract, position: $position, effectiveDate: $effectiveDate, recruitmentAgency: $recruitmentAgency, employmentContactNumber: $employmentContactNumber, natureOfBusiness: $natureOfBusiness, countryOfDeployment: $countryOfDeployment, dateOfEmployment: $dateOfEmployment, occupation: $occupation, isPaid: $isPaid, isDone: $isDone, paymentMethod: $paymentMethod, annualPremium: $annualPremium, passportImagePath: $passportImagePath, receiptImagePath: $receiptImagePath, submissionDate: $submissionDate, processedDate: $processedDate)';
   }
 
   @override
@@ -798,6 +815,7 @@ class _$_Info with DiagnosticableTreeMixin implements _Info {
       ..add(DiagnosticsProperty('isPaid', isPaid))
       ..add(DiagnosticsProperty('isDone', isDone))
       ..add(DiagnosticsProperty('paymentMethod', paymentMethod))
+      ..add(DiagnosticsProperty('annualPremium', annualPremium))
       ..add(DiagnosticsProperty('passportImagePath', passportImagePath))
       ..add(DiagnosticsProperty('receiptImagePath', receiptImagePath))
       ..add(DiagnosticsProperty('submissionDate', submissionDate))
@@ -865,6 +883,8 @@ class _$_Info with DiagnosticableTreeMixin implements _Info {
             const DeepCollectionEquality()
                 .equals(other.paymentMethod, paymentMethod) &&
             const DeepCollectionEquality()
+                .equals(other.annualPremium, annualPremium) &&
+            const DeepCollectionEquality()
                 .equals(other.passportImagePath, passportImagePath) &&
             const DeepCollectionEquality()
                 .equals(other.receiptImagePath, receiptImagePath) &&
@@ -913,6 +933,7 @@ class _$_Info with DiagnosticableTreeMixin implements _Info {
         const DeepCollectionEquality().hash(isPaid),
         const DeepCollectionEquality().hash(isDone),
         const DeepCollectionEquality().hash(paymentMethod),
+        const DeepCollectionEquality().hash(annualPremium),
         const DeepCollectionEquality().hash(passportImagePath),
         const DeepCollectionEquality().hash(receiptImagePath),
         const DeepCollectionEquality().hash(submissionDate),
@@ -967,6 +988,7 @@ abstract class _Info implements Info {
       final bool isPaid,
       final bool isDone,
       final String paymentMethod,
+      final String annualPremium,
       final String passportImagePath,
       final String receiptImagePath,
       final String submissionDate,
@@ -1045,6 +1067,8 @@ abstract class _Info implements Info {
   bool get isDone => throw _privateConstructorUsedError;
   @override
   String get paymentMethod => throw _privateConstructorUsedError;
+  @override
+  String get annualPremium => throw _privateConstructorUsedError;
   @override
   String get passportImagePath => throw _privateConstructorUsedError;
   @override

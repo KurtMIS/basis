@@ -42,6 +42,7 @@ class Info with _$Info {
     @Default(false) bool isPaid,
     @Default(false) bool isDone,
     @Default('') String paymentMethod,
+    @Default('') String annualPremium,
     @Default('') String passportImagePath,
     @Default('') String receiptImagePath,
     @Default('') String submissionDate,

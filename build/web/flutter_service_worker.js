@@ -3,10 +3,15 @@ const MANIFEST = 'flutter-app-manifest';
 const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 const RESOURCES = {
-  "assets/AssetManifest.json": "222bc785bdb07236eb8746bafcb02592",
+  "assets/AssetManifest.json": "0e9379532d6c0372b52e9456a928194c",
 "assets/FontManifest.json": "dc3d03800ccca4601324923c0b1d6d57",
 "assets/fonts/MaterialIcons-Regular.otf": "95db9098c58fd6db106f1116bae85a0b",
-"assets/NOTICES": "bc5e8a202292e60d9f8618f3f7922957",
+"assets/lib/assets/logo.png": "568fcde207d4b9fd74a7e0c91d38381f",
+"assets/lib/generated_plugin_registrant.dart": "fc683388750174e55013a592988837c2",
+"assets/lib/main.dart": "c073e55c9915f1212e716421e2a1329d",
+"assets/lib/modules/logics/main.dart": "0040aba1dc437b386e7c727f467030b6",
+"assets/lib/modules/views/main.dart": "b6fcdce8620182cf8310e5b751b9198c",
+"assets/NOTICES": "d550addf94123bdd9acc573f6fbe2ce4",
 "assets/packages/cupertino_icons/assets/CupertinoIcons.ttf": "6d342eb68f170c97609e9da345464e5e",
 "assets/packages/fluttertoast/assets/toastify.css": "a85675050054f179444bc5ad70ffc635",
 "assets/packages/fluttertoast/assets/toastify.js": "e7006a0a033d834ef9414d48db3be6fc",
@@ -20,10 +25,20 @@ const RESOURCES = {
 "icons/Icon-512.png": "96e752610906ba2a93c65f8abe1645f1",
 "icons/Icon-maskable-192.png": "c457ef57daa1d16f64b27b786ec2ea3c",
 "icons/Icon-maskable-512.png": "301a7604d45b3e739efc881eb04896ea",
-"index.html": "783c6b072c761861bae9b899e44b715b",
-"/": "783c6b072c761861bae9b899e44b715b",
-"main.dart.js": "12f09e6f20918dbf2375337e5360f3e4",
+"index.html": "4040ad8326e932ccb75132667e561dbc",
+"/": "4040ad8326e932ccb75132667e561dbc",
+"main.dart.js": "18c90236241c983ea14a61974352e5b7",
 "manifest.json": "a195e26c4d8a12267e94fd4a8a838d3e",
+"splash/img/dark-1x.png": "031e72b195129753db5e994739222e20",
+"splash/img/dark-2x.png": "162c4dfb7a940cc17b9198c2d69da864",
+"splash/img/dark-3x.png": "3e65ae03c9b424927b7e22fe7e7ab4da",
+"splash/img/dark-4x.png": "3a2bd2efcf03ee340599267f07409c65",
+"splash/img/light-1x.png": "031e72b195129753db5e994739222e20",
+"splash/img/light-2x.png": "162c4dfb7a940cc17b9198c2d69da864",
+"splash/img/light-3x.png": "3e65ae03c9b424927b7e22fe7e7ab4da",
+"splash/img/light-4x.png": "3a2bd2efcf03ee340599267f07409c65",
+"splash/splash.js": "123c400b58bea74c1305ca3ac966748d",
+"splash/style.css": "2e6df68c18efc965e0beb1b72c5b4ae9",
 "version.json": "80bcfc2735a5c2efe5a2b805a0c3ddb8"
 };
 

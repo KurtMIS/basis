@@ -1,5 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:extended_image/extended_image.dart';
+import 'dart:html';
+import 'dart:ui' as ui;
+import '../constants/measure.dart';
 // import 'package:extended_image_library/extended_image_library.dart';
 
 class ImageWithState extends StatelessWidget {
@@ -27,6 +31,11 @@ class ImageWithState extends StatelessWidget {
         future: futureUrl,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
+            if (kIsWeb && isWeb(context)) {
+              return const Text('Click to open image',
+                  style: TextStyle(fontSize: 18));
+            }
+
             return ExtendedImage.network(
               snapshot.data!,
               width: width,
@@ -36,7 +45,6 @@ class ImageWithState extends StatelessWidget {
               shape: boxShape,
               cache: true,
               loadStateChanged: (ExtendedImageState state) {
-                // print('url    $url');
                 switch (state.extendedImageLoadState) {
                   case LoadState.loading:
                     // _controller.reset();

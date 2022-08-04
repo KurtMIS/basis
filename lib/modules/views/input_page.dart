@@ -1,21 +1,22 @@
 import 'dart:async';
-import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:stronghold_ofw/modules/shared_widgets/textfield.dart';
 import '../../constants/measure.dart';
-import '../../services/locator.dart';
+import '../../services1/locator.dart';
+import '../../utils/date_convert.dart';
 import '../../utils/future_image.dart';
 import '../logics/input.dart';
 import '../models/dependent/dependent.dart';
 import '../models/info/info.dart';
 import '../shared_widgets/dialogs.dart';
 import '../shared_widgets/popup_containers.dart';
+import 'dart:html';
+import 'dart:ui' as ui;
 
 class InputPage extends StatefulWidget {
   const InputPage({Key? key}) : super(key: key);
@@ -28,7 +29,6 @@ class _InputPageState extends State<InputPage> {
   final inputBloc = locator.get<Input>();
 
   final CarouselController carouselCtrler = CarouselController();
-  // final _formKey = GlobalKey<FormState>();
   final _current$ = BehaviorSubject<int>.seeded(0);
   final _selectedPayment$ = BehaviorSubject<int>.seeded(0);
 
@@ -50,8 +50,6 @@ class _InputPageState extends State<InputPage> {
   final telNumber = TextEditingController();
   final passportNumber = TextEditingController();
   final expiryDate = TextEditingController();
-  final sssNumber = TextEditingController();
-  final tinNumber = TextEditingController();
   final _dependents = BehaviorSubject<List<Dependent>>.seeded([]);
   final agent = TextEditingController()..text = 'Koronadal Branch';
   final employerName = TextEditingController();
@@ -71,18 +69,26 @@ class _InputPageState extends State<InputPage> {
   final dateOfBirthDependent = TextEditingController();
   final sharingDependent = TextEditingController();
   final revocableDependent = TextEditingController();
+
+  final annualPremium = TextEditingController();
+  final agentName = TextEditingController();
   final paymentMethod = '';
   var passportImagePath = '';
   var receiptImagePath = '';
   var id = '';
+  var isUpdating = false;
   String docIdFromCurrentDate() => DateTime.now().toIso8601String();
 
   void setInfo() async {
-    final res =
-        await showConfirmDialog(context, 'Are you sure you want to proceed');
+    final res = await showConfirmDialog(
+        context,
+        isUpdating
+            ? 'Are you sure you want to update form?'
+            : 'Are you sure you want to send form?');
     if (!res) {
       return;
     }
+
     await inputBloc.setInfo(
         Info(
             id: id,
@@ -112,26 +118,43 @@ class _InputPageState extends State<InputPage> {
             provincialAddress: provincialAddress.text,
             recruitmentAgency: recruitmentAgency.text,
             religion: religion.text,
-            sssNumber: sssNumber.text,
             telNumber: telNumber.text,
             termOfContract: termOfContract.text,
-            tinNumber: tinNumber.text,
             isDone: false,
             isPaid: false,
             passportImagePath: passportImagePath,
             paymentMethod: _selectedPayment$.value.toString(),
             submissionDate: DateFormat('dd/MM/yyyy').format(DateTime.now()),
-            receiptImagePath: receiptImagePath),
+            receiptImagePath: receiptImagePath,
+            annualPremium: annualPremium.text,
+            processedDate: ''),
         context);
     //done
-    Navigator.pushReplacementNamed(context, 'view');
+    showToastSuccess(
+      'Transaction Successful!',
+    );
+    if (locator.get<Input>().isAdmin) {
+      Navigator.pushReplacementNamed(context, 'view');
+    } else {
+      Navigator.pushReplacementNamed(context, 'home');
+    }
+  }
+
+  void clearDependents() {
+    dateOfBirthDependent.clear();
+    nameDependent.clear();
+    relationshipDependent.clear();
+    revocableDependent.clear();
+    sharingDependent.clear();
   }
 
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final info = inputBloc.info;
+
       if (info.id != '') {
+        isUpdating = true;
         id = info.id;
         presentAddress.text = info.presentAddress;
         agent.text = info.agent;
@@ -158,20 +181,30 @@ class _InputPageState extends State<InputPage> {
         provincialAddress.text = info.provincialAddress;
         recruitmentAgency.text = info.recruitmentAgency;
         religion.text = info.religion;
-        sssNumber.text = info.sssNumber;
         telNumber.text = info.telNumber;
         termOfContract.text = info.termOfContract;
-        tinNumber.text = info.tinNumber;
         inputBloc.passportImage$.add(info.passportImagePath);
         inputBloc.receiptImage$.add(info.receiptImagePath);
+        annualPremium.text = info.annualPremium;
+        receiptImagePath = info.receiptImagePath;
+        passportImagePath = info.passportImagePath;
 
+        var list = <Dependent>[];
+        for (var element in info.dependents) {
+          list.add(Dependent.fromJson(element));
+        }
+        _dependents.add(list);
         Future.delayed(const Duration(milliseconds: 200), () {
           _current$.add(3);
           carouselCtrler.jumpToPage(3);
           _selectedPayment$.add(int.parse(info.paymentMethod));
         });
       } else {
+        isUpdating = false;
+        passportImagePath = '';
+        passportImagePath = '';
         inputBloc.passportImage$.add('');
+
         inputBloc.receiptImage$.add('');
       }
     });
@@ -181,13 +214,6 @@ class _InputPageState extends State<InputPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:
-          // appBar: isWeb(context)
-          // ?
-          AppBar(
-        title: const Text('Stronghold for OFW'),
-      ),
-      // : null,
       floatingActionButton: FloatingActionButton(
           onPressed: () {
             scrollCtrler.animateTo(
@@ -204,15 +230,18 @@ class _InputPageState extends State<InputPage> {
             SingleChildScrollView(
               physics: const NeverScrollableScrollPhysics(),
               child: Column(children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    previousButton(),
-                    StreamBuilder<int>(
-                        stream: _current$,
-                        builder: (context, snapshot) {
-                          final val = snapshot.hasData ? snapshot.data : 0;
-                          return Column(
+                StreamBuilder<int>(
+                    stream: _current$,
+                    builder: (context, snapshot) {
+                      if (snapshot.data == null) {
+                        return const SizedBox();
+                      }
+                      final val = snapshot.hasData ? snapshot.data : 0;
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          previousButton(),
+                          Column(
                             children: [
                               Text(
                                 pageTitles(val!),
@@ -220,11 +249,11 @@ class _InputPageState extends State<InputPage> {
                               ),
                               pageIndicator(val),
                             ],
-                          );
-                        }),
-                    nextButton(),
-                  ],
-                ),
+                          ),
+                          nextButton(snapshot.data!),
+                        ],
+                      );
+                    }),
                 const Divider(
                   height: 1,
                 ),
@@ -246,14 +275,49 @@ class _InputPageState extends State<InputPage> {
     );
   }
 
-  Widget nextButton() {
+  Widget nextButton(int current) {
     return IconButton(
       icon: const Icon(Icons.arrow_forward_ios),
       onPressed: () {
+        if (current == 0 && !personalInfoCheck()) {
+          showToast('Fields with asterisk(*) are required');
+          return;
+        }
+        if (current == 2 && !employmentInfoCheck()) {
+          showToast('All Fields in employment screen are required');
+          return;
+        }
         carouselCtrler.nextPage();
       },
     );
   }
+
+  bool personalInfoCheck() => (c(lastName) &&
+      c(firstName) &&
+      c(presentAddress) &&
+      c(dateOfBirth) &&
+      c(placeOfBirth) &&
+      c(nationality) &&
+      c(gender) &&
+      c(religion) &&
+      c(civilStatus) &&
+      c(email) &&
+      c(mobileNumber) &&
+      passportImagePath.trim().isNotEmpty);
+
+  bool employmentInfoCheck() => (c(employerName) &&
+      c(employmentContactNumber) &&
+      c(employerAddress) &&
+      c(termOfContract) &&
+      c(countryOfDeployment) &&
+      c(natureOfBusiness) &&
+      c(position) &&
+      c(employmentDate) &&
+      c(effectiveDate));
+
+  bool summaryInfoCheck() => (c(annualPremium));
+
+  bool c(TextEditingController text) => text.text.trim().isNotEmpty;
 
   String pageTitles(int current) {
     if (current == 0) {
@@ -339,18 +403,19 @@ class _InputPageState extends State<InputPage> {
               placeOfBirth,
               '*Place of Birth',
             ),
-            textField(nationality, '*Nationality', hintText: 'Filipino'),
-            textField(gender, '*Gender', hintText: 'Male/Female'),
+            textField(nationality, '*Nationality', hintText: 'Ex. Filipino...'),
+            textField(gender, '*Gender', hintText: 'Ex. Male/Female...'),
             textField(
               religion,
               '*Religion',
             ),
-            textField(civilStatus, '*Civil Status', hintText: 'Single/Married'),
+            textField(civilStatus, '*Civil Status',
+                hintText: 'Ex. Single or Married...'),
             textField(email, '*E-mail Address',
-                hintText: 'delacruz@gmail.com',
+                hintText: 'Ex. delacruz@gmail.com...',
                 keyboardType: TextInputType.emailAddress,
-                onChanged: 'test'),
-            textField(mobileNumber, 'Mobile Number',
+                onChanged: 'true'),
+            textField(mobileNumber, '*Mobile Number',
                 keyboardType: TextInputType.phone),
             textField(telNumber, 'Telephone Number',
                 keyboardType: TextInputType.phone),
@@ -365,7 +430,7 @@ class _InputPageState extends State<InputPage> {
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Passport',
+                          const Text('*Passport',
                               style: TextStyle(fontWeight: FontWeight.bold)),
                           const SizedBox(height: 5),
                           const SizedBox(height: 15),
@@ -401,8 +466,12 @@ class _InputPageState extends State<InputPage> {
                                       showToast('Email is required');
                                       return;
                                     }
-                                    await inputBloc.pickImage(true, id,
-                                        'passport', inputBloc.passportImage$);
+                                    passportImagePath =
+                                        await inputBloc.pickImage(
+                                            true,
+                                            id,
+                                            'passport',
+                                            inputBloc.passportImage$);
                                   },
                                   splashRadius: 30,
                                   iconSize: 40,
@@ -421,6 +490,19 @@ class _InputPageState extends State<InputPage> {
                                   if (snapshot.data == null) {
                                     return const SizedBox();
                                   }
+                                  if (snapshot.data == 'z') {
+                                    return Center(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: const [
+                                          Text('Uploading image'),
+                                          SizedBox(height: 10),
+                                          CircularProgressIndicator.adaptive(),
+                                        ],
+                                      ),
+                                    );
+                                  }
                                   if (snapshot.data == '') {
                                     return const Center(
                                         child: Text('No image'));
@@ -433,6 +515,7 @@ class _InputPageState extends State<InputPage> {
                                           context: context,
                                           builder: (_) => imageDialog(
                                               tag: snapshot.data!,
+                                              isWeb: isWeb(context) && kIsWeb,
                                               context: context));
                                     },
                                     child: ImageWithState(
@@ -444,6 +527,7 @@ class _InputPageState extends State<InputPage> {
                                   );
                                 }),
                           ),
+                          const SizedBox(height: 15),
                           const Text(
                             '*Image must be clear',
                             style: TextStyle(
@@ -452,9 +536,6 @@ class _InputPageState extends State<InputPage> {
                         ]),
                   ),
                 )),
-            textField(sssNumber, 'SSS Number',
-                keyboardType: TextInputType.number),
-            textField(tinNumber, 'TIN', keyboardType: TextInputType.number),
           ],
         ),
         Column(
@@ -489,7 +570,191 @@ class _InputPageState extends State<InputPage> {
                                           Text(x.relationshipToInsured)
                                         ],
                                       ),
-                                      onTap: () {},
+                                      onTap: () {
+                                        clearDependents();
+                                        nameDependent.text = x.name;
+                                        relationshipDependent.text =
+                                            x.relationshipToInsured;
+                                        if (x.dateOfBirth != null) {
+                                          dateOfBirthDependent.text =
+                                              DateFormat('dd/MM/yyyy')
+                                                  .format(x.dateOfBirth!);
+                                        }
+                                        sharingDependent.text = x.sharing;
+                                        revocableDependent.text =
+                                            x.revocability;
+                                        final isUpdate = nameDependent.text
+                                            .trim()
+                                            .isNotEmpty;
+
+                                        void remove() {
+                                          _dependents.value.removeWhere(
+                                              (element) =>
+                                                  element.name == x.name);
+                                          _dependents.add(_dependents.value);
+                                        }
+
+                                        showDialogShared(
+                                            context,
+                                            Container(
+                                              constraints: const BoxConstraints(
+                                                  maxHeight: 500),
+                                              // height: 220,
+                                              width: 330,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(16),
+                                              ),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  const Padding(
+                                                    padding: EdgeInsets.all(16),
+                                                    child: Text(
+                                                      'Dependent Information',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w800,
+                                                        fontSize: 18,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const Divider(
+                                                    height: 0,
+                                                    thickness: 1,
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            16),
+                                                    child: Column(
+                                                      children: [
+                                                        textField(nameDependent,
+                                                            'Full Name'),
+                                                        const SizedBox(
+                                                            height: 20),
+                                                        textField(
+                                                            relationshipDependent,
+                                                            'This person\'s relationship to you'),
+                                                        const SizedBox(
+                                                            height: 20),
+                                                        textFieldDate(
+                                                            dateOfBirthDependent,
+                                                            'Date of Birth'),
+                                                        const SizedBox(
+                                                            height: 20),
+                                                        textField(
+                                                            sharingDependent,
+                                                            'Sharing ( Ex. 50%, 25%)',
+                                                            keyboardType:
+                                                                TextInputType
+                                                                    .number),
+                                                        const SizedBox(
+                                                            height: 20),
+                                                        textFieldChoice(
+                                                            revocableDependent,
+                                                            'Can be Cancelled?',
+                                                            ['Yes', 'No']),
+                                                        const SizedBox(
+                                                            height: 20),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 16,
+                                                            right: 16,
+                                                            bottom: 16),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceEvenly,
+                                                      children: [
+                                                        ElevatedButton(
+                                                            child: Text(isUpdate
+                                                                ? 'Update Dependent'
+                                                                : 'Add Dependent'),
+                                                            onPressed:
+                                                                () async {
+                                                              remove();
+                                                              var date = [];
+                                                              if (dateOfBirthDependent
+                                                                  .text
+                                                                  .isEmpty) {
+                                                              } else {
+                                                                date =
+                                                                    dateOfBirthDependent
+                                                                        .text
+                                                                        .split(
+                                                                            '/');
+                                                              }
+                                                              final dependent = Dependent(
+                                                                  name:
+                                                                      nameDependent
+                                                                          .text,
+                                                                  relationshipToInsured:
+                                                                      relationshipDependent
+                                                                          .text,
+                                                                  dateOfBirth: date
+                                                                          .isEmpty
+                                                                      ? null
+                                                                      : DateTime
+                                                                          .parse(
+                                                                              '${date[2]}-${date[1]}-${date[0]}'),
+                                                                  revocability:
+                                                                      revocableDependent
+                                                                          .text,
+                                                                  sharing:
+                                                                      sharingDependent
+                                                                          .text);
+                                                              if (_dependents
+                                                                  .value
+                                                                  .isEmpty) {
+                                                                _dependents
+                                                                    .add([
+                                                                  dependent
+                                                                ]);
+                                                              } else {
+                                                                _dependents
+                                                                    .add([
+                                                                  ..._dependents
+                                                                      .value,
+                                                                  dependent
+                                                                ]);
+                                                              }
+                                                              Navigator.pop(
+                                                                  context);
+                                                            }),
+                                                        if (isUpdate)
+                                                          const SizedBox(
+                                                            height: 20,
+                                                          ),
+                                                        if (isUpdate)
+                                                          ElevatedButton(
+                                                              style: TextButton
+                                                                  .styleFrom(
+                                                                      backgroundColor:
+                                                                          Colors
+                                                                              .red),
+                                                              onPressed: () {
+                                                                remove();
+                                                                Navigator.pop(
+                                                                    context);
+                                                              },
+                                                              child: const Text(
+                                                                  'Remove Depedent'))
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ));
+                                      },
                                       contentPadding: const EdgeInsets.all(5),
                                       subtitle: Padding(
                                         padding: const EdgeInsets.symmetric(
@@ -519,80 +784,103 @@ class _InputPageState extends State<InputPage> {
               FloatingActionButton.extended(
                   icon: const Icon(Icons.add),
                   onPressed: () {
+                    clearDependents();
                     showDialogShared(
                         context,
-                        Container(
-                          constraints: const BoxConstraints(maxHeight: 500),
-                          // height: 220,
-                          width: 330,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Padding(
-                                padding: EdgeInsets.all(16),
-                                child: Text(
-                                  'Dependent Information',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 18,
+                        Stack(
+                          children: [
+                            Container(
+                              constraints: const BoxConstraints(maxHeight: 500),
+                              width: 330,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.all(16),
+                                    child: Text(
+                                      'Dependent Information',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 18,
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                  const Divider(
+                                    height: 0,
+                                    thickness: 1,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(16),
+                                    child: Column(
+                                      children: [
+                                        textField(nameDependent, 'Full Name'),
+                                        const SizedBox(height: 20),
+                                        textField(relationshipDependent,
+                                            'What is your relationship to this person'),
+                                        const SizedBox(height: 20),
+                                        textFieldDate(dateOfBirthDependent,
+                                            'Date of Birth'),
+                                        const SizedBox(height: 20),
+                                        textField(sharingDependent,
+                                            'Sharing ( Ex. 50%, 25%)',
+                                            keyboardType: TextInputType.number),
+                                        const SizedBox(height: 20),
+                                        textFieldChoice(revocableDependent,
+                                            'Can be Cancelled?', ['Yes', 'No']),
+                                        const SizedBox(height: 20),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.only(
+                                        left: 16, right: 16, bottom: 16),
+                                    child: ElevatedButton(
+                                        child: const Text('Add Dependent'),
+                                        onPressed: () async {
+                                          var date = [];
+                                          if (dateOfBirthDependent
+                                              .text.isEmpty) {
+                                          } else {
+                                            date = dateOfBirthDependent.text
+                                                .split('/');
+                                          }
+                                          final dependent = Dependent(
+                                              name: nameDependent.text,
+                                              relationshipToInsured:
+                                                  relationshipDependent.text,
+                                              dateOfBirth: date.isEmpty
+                                                  ? null
+                                                  : DateTime.parse(
+                                                      '${date[2]}-${date[1]}-${date[0]}'),
+                                              revocability:
+                                                  revocableDependent.text,
+                                              sharing: sharingDependent.text);
+                                          if (_dependents.value.isEmpty) {
+                                            _dependents.add([dependent]);
+                                          } else {
+                                            _dependents.add([
+                                              ..._dependents.value,
+                                              dependent
+                                            ]);
+                                          }
+                                          Navigator.pop(context);
+                                        }),
+                                  ),
+                                ],
                               ),
-                              const Divider(
-                                height: 0,
-                                thickness: 1,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Column(
-                                  children: [
-                                    textField(nameDependent, 'Full Name'),
-                                    const SizedBox(height: 20),
-                                    textField(relationshipDependent,
-                                        'Relationship to this person'),
-                                    const SizedBox(height: 20),
-                                    textFieldDate(
-                                        dateOfBirthDependent, 'Date of Birth'),
-                                    const SizedBox(height: 20),
-                                    textField(sharingDependent, 'Sharing ( % )',
-                                        keyboardType: TextInputType.number),
-                                    const SizedBox(height: 20),
-                                    textField(revocableDependent, 'Revocable?',
-                                        hintText: 'Yes or No only'),
-                                    const SizedBox(height: 20),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.only(
-                                    left: 16, right: 16, bottom: 16),
-                                child: ElevatedButton(
-                                    child: const Text('Add Dependent'),
-                                    onPressed: () async {
-                                      final date =
-                                          dateOfBirthDependent.text.split('/');
-                                      final dependent = Dependent(
-                                          name: nameDependent.text,
-                                          relationshipToInsured:
-                                              relationshipDependent.text,
-                                          dateOfBirth: DateTime.parse(
-                                              '${date[2]}-${date[1]}-${date[0]}'),
-                                          revocability: revocableDependent.text,
-                                          sharing: sharingDependent.text);
-                                      if (_dependents.value.isEmpty) {
-                                        _dependents.add([dependent]);
-                                      } else {
-                                        _dependents.add(
-                                            [..._dependents.value, dependent]);
-                                      }
-                                      Navigator.pop(context);
-                                    }),
-                              ),
-                            ],
-                          ),
+                            ),
+                            Positioned(
+                              right: 0,
+                              child: IconButton(
+                                  icon: const Icon(Icons.close),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  }),
+                            )
+                          ],
                         ));
                   },
                   label: const Text('Add dependent'))
@@ -610,9 +898,6 @@ class _InputPageState extends State<InputPage> {
               spacing: 25.0,
               runSpacing: 20.0,
               children: [
-                textField(agent, 'Agent', readOnly: true),
-                textField(recruitmentAgency, 'Recruitment Agency',
-                    readOnly: true),
                 textField(
                   employerName,
                   'Employer Name',
@@ -625,8 +910,9 @@ class _InputPageState extends State<InputPage> {
                     ctrler: employerAddress,
                     labelText: 'Employer Address',
                     keyboardType: TextInputType.streetAddress),
-                // textField(termOfContract, 'Term of Contract:'),
-                textFieldChoice(termOfContract, 'Term Of Contract'),
+                const Divider(),
+                textFieldChoice(termOfContract, 'Term Of Contract',
+                    ['12 months', '24 months', '36months']),
                 textField(countryOfDeployment, 'Country of Deployment'),
                 textField(natureOfBusiness, 'Nature of Business:'),
                 textField(position, 'Position'),
@@ -649,7 +935,8 @@ class _InputPageState extends State<InputPage> {
                 alignment: Alignment.center,
                 width: double.infinity,
                 color: Colors.blue,
-                child: const Text('Personal Information')),
+                child: const Text('Personal Information',
+                    style: TextStyle(color: Colors.white))),
             const SizedBox(height: 20),
             Wrap(
               crossAxisAlignment: WrapCrossAlignment.start,
@@ -680,16 +967,11 @@ class _InputPageState extends State<InputPage> {
                 text(email, '*E-mail Address'),
                 text(mobileNumber, 'Mobile Number'),
                 text(telNumber, 'Telephone Number'),
-                text(passportNumber, '*Passport Number'),
-                text(
-                  expiryDate,
-                  '*Expiry Date',
-                ),
-                text(sssNumber, 'SSS Number'),
-                text(
-                  tinNumber,
-                  'TIN',
-                ),
+                // text(passportNumber, '*Passport Number'),
+                // text(
+                //   expiryDate,
+                //   '*Expiry Date',
+                // ),
               ],
             ),
             const Divider(),
@@ -698,7 +980,8 @@ class _InputPageState extends State<InputPage> {
                 alignment: Alignment.center,
                 width: double.infinity,
                 color: Colors.blue,
-                child: const Text('Dependent Info')),
+                child: const Text('Dependents',
+                    style: TextStyle(color: Colors.white))),
             const SizedBox(height: 20),
             StreamBuilder<List<Dependent>>(
                 stream: _dependents,
@@ -760,7 +1043,8 @@ class _InputPageState extends State<InputPage> {
                 alignment: Alignment.center,
                 width: double.infinity,
                 color: Colors.blue,
-                child: const Text('Employment Information')),
+                child: const Text('Employment Information',
+                    style: TextStyle(color: Colors.white))),
             const SizedBox(height: 20),
             Wrap(
               crossAxisAlignment: WrapCrossAlignment.start,
@@ -768,39 +1052,21 @@ class _InputPageState extends State<InputPage> {
               spacing: 0.0,
               runSpacing: 10.0,
               children: [
-                text(lastName, 'Last Name: '),
+                text(employerName, 'Employer Name: '),
                 text(
-                  firstName,
-                  'First Name',
+                  employmentContactNumber,
+                  'Employer Contact No.',
                 ),
+                textLong(employerAddress, 'Employer Address'),
+                text(termOfContract, 'Term Of Contract'),
+                text(countryOfDeployment, 'Country Of Deployment'),
                 text(
-                  middleName,
-                  'Middle Name',
+                  natureOfBusiness,
+                  'Nature Of Business',
                 ),
-                textLong(presentAddress, 'Present Address'),
-                textLong(provincialAddress, 'Provincial Address'),
-                text(dateOfBirth, '*Date of Birth'),
-                text(
-                  placeOfBirth,
-                  '*Place of Birth',
-                ),
-                text(nationality, '*Nationality'),
-                text(gender, '*Gender'),
-                text(religion, '*Religion'),
-                text(civilStatus, '*Civil Status'),
-                text(email, '*E-mail Address'),
-                text(mobileNumber, 'Mobile Number'),
-                text(telNumber, 'Telephone Number'),
-                text(passportNumber, '*Passport Number'),
-                text(
-                  expiryDate,
-                  '*Expiry Date',
-                ),
-                text(sssNumber, 'SSS Number'),
-                text(
-                  tinNumber,
-                  'TIN',
-                ),
+                text(position, 'Position'),
+                text(employmentDate, 'Date of Employment'),
+                text(effectiveDate, 'Departure/Effective Date'),
               ],
             ),
             const Divider(),
@@ -810,7 +1076,23 @@ class _InputPageState extends State<InputPage> {
                 alignment: Alignment.center,
                 width: double.infinity,
                 color: Colors.blue,
-                child: const Text('Payment Options')),
+                child: const Text('Payment',
+                    style: TextStyle(color: Colors.white))),
+            const SizedBox(height: 15),
+            textFieldChoice(annualPremium, 'Annual Premium', [
+              '\$24 for one(1) year',
+              '\$48 for two(2) years',
+              '\$72 for three(3) years'
+            ]),
+            const Divider(),
+            const SizedBox(height: 20),
+            Container(
+                padding: const EdgeInsets.all(10),
+                alignment: Alignment.center,
+                width: double.infinity,
+                color: Colors.blue,
+                child: const Text('Payment Options',
+                    style: TextStyle(color: Colors.white))),
             StreamBuilder<int>(
                 stream: _selectedPayment$,
                 builder: (context, snapshot) {
@@ -820,22 +1102,35 @@ class _InputPageState extends State<InputPage> {
                   final data = snapshot.data;
                   return Column(
                     children: [
-                      ListTile(
-                        onTap: () {
-                          if (data == 1) {
-                            _selectedPayment$.add(0);
-                            return;
-                          }
-                          _selectedPayment$.add(1);
-                        },
-                        title: const Text('Pay to agent'),
-                        leading: data == 1
-                            ? const Icon(Icons.circle_rounded,
-                                color: Colors.green)
-                            : const Icon(Icons.circle_outlined),
-                        // subtitle: Text('09207433898'),
-                      ),
-                      const Divider(),
+                      // ListTile(
+                      //   onTap: () {
+                      //     if (data == 1) {
+                      //       _selectedPayment$.add(0);
+                      //       return;
+                      //     }
+                      //     _selectedPayment$.add(1);
+                      //   },
+                      //   title:
+                      //   Column(
+                      //     crossAxisAlignment: CrossAxisAlignment.start,
+                      //     mainAxisAlignment: MainAxisAlignment.start,
+                      //     children: [
+                      //       const Text('Pay to agent'),
+                      //       if (data! == 1)
+                      //         const SizedBox(
+                      //           height: 15,
+                      //         ),
+                      //       if (data == 1)
+                      //         textFieldChoice(agentName, 'Agent Name', []),
+                      //     ],
+                      //   ),
+                      //   leading: data == 1
+                      //       ? const Icon(Icons.circle_rounded,
+                      //           color: Colors.green)
+                      //       : const Icon(Icons.circle_outlined),
+                      //   subtitle: Text('09207433898'),
+                      // ),
+                      // const Divider(),
                       ListTile(
                         onTap: () {
                           if (data == 2) {
@@ -866,8 +1161,13 @@ class _InputPageState extends State<InputPage> {
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('Account:   Jet Estacion'),
-                            const Text('Account #: 8885-5555-5555'),
+                            const SizedBox(height: 15),
+                            Text('STRONGHOLD INSURANCE COMPANY, INC.'),
+                            const SizedBox(height: 10),
+                            const Text('BDO Peso Account: \n003008061601'),
+                            const Divider(),
+                            const Text('BDO Dollar Account: \n103000678 829'),
+                            const SizedBox(height: 15),
                             if (data == 3)
                               Container(
                                   alignment: Alignment.center,
@@ -894,6 +1194,11 @@ class _InputPageState extends State<InputPage> {
                                                 children: [
                                                   IconButton(
                                                     onPressed: () async {
+                                                      if (email.text.isEmpty) {
+                                                        showToast(
+                                                            'Email is required');
+                                                        return;
+                                                      }
                                                       receiptImagePath =
                                                           await inputBloc.pickImage(
                                                               false,
@@ -913,6 +1218,11 @@ class _InputPageState extends State<InputPage> {
                                                   ),
                                                   IconButton(
                                                     onPressed: () async {
+                                                      if (email.text.isEmpty) {
+                                                        showToast(
+                                                            'Email is required');
+                                                        return;
+                                                      }
                                                       receiptImagePath =
                                                           await inputBloc.pickImage(
                                                               true,
@@ -946,6 +1256,23 @@ class _InputPageState extends State<InputPage> {
                                                           child:
                                                               Text('No image'));
                                                     }
+                                                    if (snapshot.data == 'z') {
+                                                      return Center(
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .center,
+                                                          children: const [
+                                                            Text(
+                                                                'Uploading image'),
+                                                            SizedBox(
+                                                                height: 10),
+                                                            CircularProgressIndicator
+                                                                .adaptive(),
+                                                          ],
+                                                        ),
+                                                      );
+                                                    }
                                                     final complete =
                                                         Completer();
                                                     complete.complete(
@@ -954,12 +1281,14 @@ class _InputPageState extends State<InputPage> {
                                                       onTap: () async {
                                                         await showDialog(
                                                             context: context,
-                                                            builder: (_) =>
-                                                                imageDialog(
-                                                                    tag: snapshot
-                                                                        .data!,
-                                                                    context:
-                                                                        context));
+                                                            builder: (_) => imageDialog(
+                                                                tag: snapshot
+                                                                    .data!,
+                                                                isWeb: isWeb(
+                                                                        context) &&
+                                                                    kIsWeb,
+                                                                context:
+                                                                    context));
                                                       },
                                                       child: ImageWithState(
                                                           height: 30,
@@ -971,6 +1300,7 @@ class _InputPageState extends State<InputPage> {
                                                     );
                                                   }),
                                             ),
+                                            const SizedBox(height: 10),
                                             const Text(
                                               '*Image must be clear',
                                               style: TextStyle(
@@ -990,16 +1320,23 @@ class _InputPageState extends State<InputPage> {
                       ),
                       const Divider(),
                       const SizedBox(height: 30),
+                      if (_selectedPayment$.value > 0)
+                        Text(
+                          _selectedPayment$.value == 1
+                              ? '*Pay to agent first before you click send form'
+                              : '*Process payment first before you click send form',
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      const SizedBox(height: 15),
+                      const Text(
+                        'Receive the certificate through email within 24 working hours',
+                      ),
                     ],
                   );
                 }),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  '*Process payment first before you send form',
-                  style: TextStyle(color: Colors.red),
-                ),
                 const SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.all(25.0),
@@ -1009,15 +1346,27 @@ class _InputPageState extends State<InputPage> {
                         backgroundColor: Colors.green,
                         padding: const EdgeInsets.all(15)),
                     onPressed: () {
+                      if (!summaryInfoCheck()) {
+                        showToast('Annual premium is empty');
+                        return;
+                      }
+
                       if (_selectedPayment$.value == 0) {
                         showToast('No payment option selected');
                         return;
                       }
+
+                      if (_selectedPayment$.value == 3 &&
+                          receiptImagePath.trim().isEmpty) {
+                        showToast('Transaction Receipt image is required');
+                        return;
+                      }
                       setInfo();
                     },
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Text('Send Form', style: TextStyle(fontSize: 15)),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                      child: Text(isUpdating ? 'Update Form' : 'Send Form',
+                          style: const TextStyle(fontSize: 15)),
                     ),
                   )),
                 ),
@@ -1032,7 +1381,7 @@ class _InputPageState extends State<InputPage> {
       controller: ctrler,
       readOnly: true,
       keyboardType: TextInputType.none,
-      enabled: true,
+      enabled: false,
       decoration: InputDecoration(
         labelText: labelText,
         border: InputBorder.none,
@@ -1047,7 +1396,7 @@ class _InputPageState extends State<InputPage> {
       readOnly: true,
       autovalidateMode: AutovalidateMode.always,
       keyboardType: TextInputType.none,
-      validator: (str) => str,
+      // validator: (str) => str,
       // constraints:
       maxLines: 3,
       decoration: InputDecoration(
@@ -1073,6 +1422,7 @@ class _InputPageState extends State<InputPage> {
       keyboardType: keyboardType,
       onChanged: (str) {
         if (onChanged != null) {
+          print(email.text);
           id = email.text;
         }
       },
@@ -1089,18 +1439,24 @@ class _InputPageState extends State<InputPage> {
     );
   }
 
-  Widget textFieldDate(
-    TextEditingController ctrler,
-    String labelText,
-  ) {
+  Widget textFieldDate(TextEditingController ctrler, String labelText,
+      {bool? condition}) {
     return TextFieldShared(
       ctrler: ctrler,
       labelText: labelText,
       readOnly: true,
       constraints: const BoxConstraints(maxWidth: 300),
       keyboardType: TextInputType.none,
-      onTap: () {
-        selectPopupDate(context, ctrler);
+      onTap: () async {
+        await selectPopupDate(context, ctrler);
+        if (condition != null) {
+          final date = stringToDate(ctrler.text);
+          final currentDate = DateTime.now();
+          if (date.compareTo(currentDate) > 0) {
+            showToast('Date must not ');
+            return;
+          }
+        }
       },
     );
   }
@@ -1125,11 +1481,20 @@ class _InputPageState extends State<InputPage> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(str)));
   }
 
-  Widget textFieldChoice(TextEditingController ctrler, String labelText) {
+  showToastSuccess(String str) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(str),
+      backgroundColor: Colors.green,
+      duration: const Duration(milliseconds: 4000),
+    ));
+  }
+
+  Widget textFieldChoice(
+      TextEditingController ctrler, String labelText, List<String> list) {
     return TextFieldShared(
         labelText: labelText,
         readOnly: true,
-        ctrler: termOfContract,
+        ctrler: ctrler,
         keyboardType: TextInputType.none,
         constraints:
             isWeb(context) ? const BoxConstraints(maxWidth: 300) : null,
@@ -1138,33 +1503,41 @@ class _InputPageState extends State<InputPage> {
           final result = await showDialog(
               context: context,
               builder: (_) => dialogChoiceShared(context,
-                  list: ['12 months', '24 months', '36months'],
-                  title: labelText,
-                  ctrler: ctrler));
+                  list: list, title: labelText, ctrler: ctrler));
           if (result == null) {
             return;
           }
-          termOfContract.text = result;
+          ctrler.text = result;
         });
   }
 
   Widget imageDialog(
       {required String tag,
+      required bool isWeb,
       // required Widget widget,
       required BuildContext context}) {
+    if (isWeb) {
+      String imageUrl = tag;
+      // ignore: undefined_prefixed_name
+      ui.platformViewRegistry.registerViewFactory(
+        imageUrl,
+        (int _) => ImageElement()..src = imageUrl,
+      );
+    }
     return Dialog(
       child: Stack(children: [
-        PhotoView(
-          tightMode: true,
-          imageProvider: NetworkImage(tag),
-        ),
+        isWeb
+            ? HtmlElementView(
+                viewType: tag,
+              )
+            : PhotoView(
+                tightMode: true,
+                imageProvider: NetworkImage(tag),
+              ),
         Positioned(
           right: 0,
           top: 0,
-          // width: 100,
-          // height: 100,
           child: IconButton(
-            // focusColor: Colors.black,
             hoverColor: Colors.black,
             color: Colors.black,
             icon: const Icon(
